@@ -1,3 +1,9 @@
+---
+title: Building an Automated SOC with Open-Source Tools
+time: 2025-07-05 12:00:00
+categories: [Labs]
+tags: [DFIR, SOC]
+---
 
 # Building an Automated SOC with Open-Source Tools (Wazuh, VirusTotal, DFIR-IRIS, Shuffle)
 
