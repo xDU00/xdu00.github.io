@@ -121,7 +121,7 @@ Before starting, ensure you have:
      ```
    - **Explanation**: Maps the Wazuh dashboard to port 443 (HTTPS) for secure access, internally using port 5601.
    - **Screenshot**:
-     ![Wazuh Docker Compose Configuration](wazuh_docker_compose.png)
+     <!--![Wazuh Docker Compose Configuration](wazuh_docker_compose.png)
      *Caption: Wazuh docker-compose.yml file showing port mapping for secure dashboard access (Figure 4.3).*
 3. **Launch Wazuh**:
    - Run the services in detached mode:
@@ -145,7 +145,7 @@ Before starting, ensure you have:
      sudo /var/ossec/bin/manage_agents -i <MANAGER_IP>
      ```
    - Verify agent status in the Wazuh Dashboard:
-     ![Wazuh Agent Registration](wazuh_agent_registration.png)
+     <!--![Wazuh Agent Registration](wazuh_agent_registration.png)
      *Caption: Wazuh agent registration process showing successful enrollment (Figure 4.6).*
      ![Wazuh Agent Monitoring](wazuh_agent_monitoring.png)
      *Caption: Wazuh Dashboard displaying agent status and logs (Figure 4.7).*
@@ -209,7 +209,7 @@ Before starting, ensure you have:
      docker-compose up -d
      ```
    - Verify containers are running:
-     ![IRIS Installation Process](iris_installation.png)
+     <!--![IRIS Installation Process](iris_installation.png)
      *Caption: Successful launch of IRIS containers using Docker Compose (Figure 4.9).*
    - Access the IRIS web interface at `https://<VM_IP>:8443`.
 4. **Integrate with Wazuh**:
@@ -239,7 +239,7 @@ Before starting, ensure you have:
      ./integrate_wazuh_iris.sh
      ```
    - **Screenshot**:
-     ![Wazuh-IRIS Integration Script](wazuh_iris_integration.png)
+     <!--![Wazuh-IRIS Integration Script](wazuh_iris_integration.png)
      *Caption: Script configuring Wazuh to send alerts to IRIS for automated ticket creation (Figure 4.10).*
    - Verify alerts in IRIS:
      ![Alerts in IRIS](iris_alerts.png)
@@ -306,7 +306,7 @@ Before starting, ensure you have:
      FRONTEND_PORT_HTTPS=3443
      ```
    - **Screenshot**:
-     ![Shuffle Environment Configuration](shuffle_env_config.png)
+     <!--![Shuffle Environment Configuration](shuffle_env_config.png)
      *Caption: Shuffle environment file configuring secure port mappings (Figure 4.20).*
 4. **Launch Shuffle**:
    - Run the services:
@@ -314,7 +314,7 @@ Before starting, ensure you have:
      docker-compose up -d
      ```
    - Verify containers are running:
-     ![Shuffle Installation Process](shuffle_installation.png)
+     <!--![Shuffle Installation Process](shuffle_installation.png)
      *Caption: Successful launch of Shuffle containers using Docker Compose (Figure 4.21).*
    - Access the Shuffle web interface at `https://<VM_IP>:3443`.
 5. **Integrate with Wazuh**:
@@ -342,10 +342,10 @@ Before starting, ensure you have:
      ./integrate_shuffle_wazuh.sh
      ```
    - **Screenshot**:
-     ![Shuffle-Wazuh Integration Script](shuffle_wazuh_integration.png)
+     <!--![Shuffle-Wazuh Integration Script](shuffle_wazuh_integration.png)
      *Caption: Script configuring Wazuh to send alerts to Shuffle via webhook (Figure 4.22).*
      ![Shuffle-Wazuh Integration Config](shuffle_wazuh_config.png)
-     *Caption: Wazuh configuration updated with Shuffle webhook settings (Figure 4.23).*
+     *Caption: Wazuh configuration updated with Shuffle webhook settings (Figure 4.23).*-->
 6. **Integrate with IRIS and VirusTotal**:
    - In the Shuffle web interface, create a workflow:
      - **Trigger**: Configure a Wazuh webhook trigger (use the hook URL from above).
@@ -364,10 +364,10 @@ Before starting, ensure you have:
      }
      ```
    - **Screenshots**:
-     ![IRIS Module Configuration](iris_module_config.png)
+     <!--![IRIS Module Configuration](iris_module_config.png)
      *Caption: Shuffle configuration for IRIS case creation with API key and URL (Figure 4.25).*
      ![Automated IRIS Ticket Creation](iris_ticket_creation.png)
-     *Caption: Successful automated ticket creation in IRIS triggered by Shuffle (Figure 4.26).*
+     *Caption: Successful automated ticket creation in IRIS triggered by Shuffle (Figure 4.26).*-->
 
 ### Step 5: Test the SOC with a Mimikatz Attack Scenario
 To validate the automated SOC, simulate a credential-dumping attack using Mimikatz, a common post-exploitation tool.
@@ -376,7 +376,7 @@ To validate the automated SOC, simulate a credential-dumping attack using Mimika
    - Deploy a Windows 10 VM with the Wazuh agent installed.
    - Download Mimikatz from a trusted source (e.g., GitHub) for testing purposes only.
    - **Screenshot**:
-     ![Mimikatz Overview](mimikatz_overview.png)
+    <!--![Mimikatz Overview](mimikatz_overview.png)-->
      *Caption: Mimikatz executable used for testing the SOC workflow (Figure 4.27).*
 
 2. **Configure Wazuh Detection Rules**:
@@ -405,7 +405,7 @@ To validate the automated SOC, simulate a credential-dumping attack using Mimika
      sudo docker-compose restart
      ```
    - **Screenshot**:
-     ![Mimikatz Detection Rules](mimikatz_rules.png)
+     <!--![Mimikatz Detection Rules](mimikatz_rules.png)-->
      *Caption: Custom Wazuh rules for detecting Mimikatz behaviors (Figure 4.28).*
 
 3. **Run Mimikatz**:
@@ -413,7 +413,7 @@ To validate the automated SOC, simulate a credential-dumping attack using Mimika
    - This triggers the Wazuh agent to detect suspicious activity.
 
 4. **Verify Workflow**:
-   - **Wazuh**: Check the Wazuh Dashboard for alerts:
+   <!--- **Wazuh**: Check the Wazuh Dashboard for alerts:
      ![Wazuh Alert in Shuffle](wazuh_alert_shuffle.png)
      *Caption: Wazuh alert for Mimikatz displayed in Shuffle dashboard (Figure 4.24).*
    - **Shuffle**: Confirm the alert triggers the workflow, queries VirusTotal, and creates an IRIS case:
@@ -443,20 +443,19 @@ To validate the automated SOC, simulate a credential-dumping attack using Mimika
      *Caption: Email sent to SOC team detailing Mimikatz detection (Figure 4.42).*
    - **Full Workflow**:
      ![Full Workflow](full_workflow.png)
-     *Caption: Complete Shuffle workflow for Mimikatz detection and response (Figure 4.43).*
+     *Caption: Complete Shuffle workflow for Mimikatz detection and response (Figure 4.43).*-->
 
 5. **Analyze Results**:
    - The workflow should complete in ~23 seconds, from detection to notification.
    - IRIS should log the incident with a timeline, evidence, and task assignments:
-     ![Incident Timeline](incident_timeline.png)
+     <!--![Incident Timeline](incident_timeline.png)
      *Caption: IRIS timeline tracking the Mimikatz incident lifecycle (Figure 4.16).*
      ![Task Assignment](task_assignment.png)
      *Caption: IRIS interface for assigning tasks to incident handlers (Figure 4.17).*
      ![Investigation Interface](investigation_interface.png)
      *Caption: IRIS investigation interface for analyzing evidence (Figure 4.18).*
-     ![Incident Reporting](incident_reporting.png)
-     *Caption: IRIS report templates management interface (Figure 4.19).*
-
+      ![Incident Reporting](incident_reporting.png)
+     *Caption: IRIS report templates management interface (Figure 4.19).*-->
 
 
 
