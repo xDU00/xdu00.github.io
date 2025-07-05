@@ -122,7 +122,7 @@ Before starting, ensure you have:
    - **Explanation**: Maps the Wazuh dashboard to port 443 (HTTPS) for secure access, internally using port 5601.
    - **Screenshot**:
      <!--![Wazuh Docker Compose Configuration](wazuh_docker_compose.png)
-     *Caption: Wazuh docker-compose.yml file showing port mapping for secure dashboard access (Figure 4.3).*
+     *Caption: Wazuh docker-compose.yml file showing port mapping for secure dashboard access (Figure 4.3).*-->
 3. **Launch Wazuh**:
    - Run the services in detached mode:
      ```bash
@@ -148,7 +148,7 @@ Before starting, ensure you have:
      <!--![Wazuh Agent Registration](wazuh_agent_registration.png)
      *Caption: Wazuh agent registration process showing successful enrollment (Figure 4.6).*
      ![Wazuh Agent Monitoring](wazuh_agent_monitoring.png)
-     *Caption: Wazuh Dashboard displaying agent status and logs (Figure 4.7).*
+     *Caption: Wazuh Dashboard displaying agent status and logs (Figure 4.7).*-->
 
 ### Step 3: Install and Configure DFIR-IRIS
 1. **Pull IRIS Docker Images**:
@@ -210,7 +210,7 @@ Before starting, ensure you have:
      ```
    - Verify containers are running:
      <!--![IRIS Installation Process](iris_installation.png)
-     *Caption: Successful launch of IRIS containers using Docker Compose (Figure 4.9).*
+     *Caption: Successful launch of IRIS containers using Docker Compose (Figure 4.9).*-->
    - Access the IRIS web interface at `https://<VM_IP>:8443`.
 4. **Integrate with Wazuh**:
    - Create a script to automate Wazuh-IRIS integration:
@@ -243,7 +243,7 @@ Before starting, ensure you have:
      *Caption: Script configuring Wazuh to send alerts to IRIS for automated ticket creation (Figure 4.10).*
    - Verify alerts in IRIS:
      ![Alerts in IRIS](iris_alerts.png)
-     *Caption: IRIS interface displaying alerts received from Wazuh (Figure 4.11).*
+     *Caption: IRIS interface displaying alerts received from Wazuh (Figure 4.11).*-->
 
 ### Step 4: Install and Configure Shuffle
 1. **Pull Shuffle Docker Images**:
@@ -307,7 +307,7 @@ Before starting, ensure you have:
      ```
    - **Screenshot**:
      <!--![Shuffle Environment Configuration](shuffle_env_config.png)
-     *Caption: Shuffle environment file configuring secure port mappings (Figure 4.20).*
+     *Caption: Shuffle environment file configuring secure port mappings (Figure 4.20).*-->
 4. **Launch Shuffle**:
    - Run the services:
      ```bash
@@ -315,7 +315,7 @@ Before starting, ensure you have:
      ```
    - Verify containers are running:
      <!--![Shuffle Installation Process](shuffle_installation.png)
-     *Caption: Successful launch of Shuffle containers using Docker Compose (Figure 4.21).*
+     *Caption: Successful launch of Shuffle containers using Docker Compose (Figure 4.21).*-->
    - Access the Shuffle web interface at `https://<VM_IP>:3443`.
 5. **Integrate with Wazuh**:
    - Create a script to configure webhook notifications:
@@ -376,8 +376,8 @@ To validate the automated SOC, simulate a credential-dumping attack using Mimika
    - Deploy a Windows 10 VM with the Wazuh agent installed.
    - Download Mimikatz from a trusted source (e.g., GitHub) for testing purposes only.
    - **Screenshot**:
-    <!--![Mimikatz Overview](mimikatz_overview.png)-->
-     *Caption: Mimikatz executable used for testing the SOC workflow (Figure 4.27).*
+    <!--![Mimikatz Overview](mimikatz_overview.png)
+     *Caption: Mimikatz executable used for testing the SOC workflow (Figure 4.27).*-->
 
 2. **Configure Wazuh Detection Rules**:
    - Edit `/var/ossec/etc/rules/local_rules.xml` on the Wazuh Manager:
@@ -405,8 +405,8 @@ To validate the automated SOC, simulate a credential-dumping attack using Mimika
      sudo docker-compose restart
      ```
    - **Screenshot**:
-     <!--![Mimikatz Detection Rules](mimikatz_rules.png)-->
-     *Caption: Custom Wazuh rules for detecting Mimikatz behaviors (Figure 4.28).*
+     <!--![Mimikatz Detection Rules](mimikatz_rules.png)
+     *Caption: Custom Wazuh rules for detecting Mimikatz behaviors (Figure 4.28).*-->
 
 3. **Run Mimikatz**:
    - Execute Mimikatz on the Windows 10 VM (e.g., `mimikatz.exe` in a test directory).
