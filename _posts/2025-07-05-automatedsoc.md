@@ -1,10 +1,3 @@
----
-title: Building an Automated SOC with Open-Source Tools
-time: 2025-07-05 12:00:00
-categories: [Labs]
-tags: [DFIR, SOC]
----
-
 # Building an Automated SOC with Open-Source Tools (Wazuh, VirusTotal, DFIR-IRIS, Shuffle)
 
 This guide walks you through creating a next-generation Security Operations Center (SOC) using open-source tools: **Wazuh** for Security Information and Event Management (SIEM), **VirusTotal** for threat intelligence, **Shuffle** for Security Orchestration, Automation, and Response (SOAR), and **DFIR-IRIS** for incident management and collaboration. By integrating these tools, you can automate threat detection, enrichment, and response, significantly improving SOC efficiency. This setup is based on a real-world project implemented.
@@ -17,196 +10,41 @@ Modern cybersecurity threats are frequent and sophisticated, overwhelming tradit
 - **Ensure Compliance**: Maintain audit logs and centralized reporting for regulations like GDPR and PCI DSS.
 
 This guide provides a step-by-step approach to building such a system, including setup, configuration, integration, and testing with a realistic attack scenario, complete with screenshots to illustrate key steps.
-
-## Tools Overview
-
-### 1. Wazuh (SIEM)
-- **Purpose**: Real-time log collection, analysis, and alert generation.
-- **Key Features**:
-  - Collects logs from endpoints (Windows, Linux) and network devices.
-  - Detects anomalies using behavioral analytics and predefined rules.
-  - Provides a web-based dashboard (via Kibana) for visualization.
-- **Why Chosen**: Open-source, scalable, and integrates well with other tools.
-
-### 2. VirusTotal (Threat Intelligence)
-- **Purpose**: Enriches alerts with data from over 70 antivirus engines and threat databases.
-- **Key Features**:
-  - Analyzes files, URLs, IPs, and domains for malicious content.
-  - Offers API support for seamless integration.
-- **Why Chosen**: Comprehensive threat intelligence with robust API for automation.
-
-### 3. Shuffle (SOAR)
-- **Purpose**: Automates workflows and orchestrates tool integration.
-- **Key Features**:
-  - Visual workflow builder for creating automated response pipelines.
-  - Supports integrations with Wazuh, VirusTotal, and IRIS via APIs.
-- **Why Chosen**: Open-source, lightweight, and flexible for custom workflows.
-
-### 4. DFIR-IRIS (Incident Management)
-- **Purpose**: Manages incident tickets, evidence collection, and team collaboration.
-- **Key Features**:
-  - Tracks incident lifecycle with timelines and task assignments.
-  - Integrates with Wazuh for automated ticket creation.
-- **Why Chosen**: Open-source platform designed for digital forensics and incident response.
-
 ## Prerequisites
 
-Before starting, ensure you have:
-- A virtual machine (VM) with:
+- I used a single virtual machine (VM) with:
   - **OS**: Ubuntu 20.04 LTS (Kernel 5.15 or later)
   - **CPU**: 6 cores
   - **Memory**: 32 GB
   - **Storage**: 466 GB
+- you can use a VM for each tool
 - Docker and Docker Compose installed on the VM.
 - A test environment with Windows 10 and Ubuntu endpoints for monitoring.
-## Step-by-Step Setup Guide
+## Architecture Overview
+![architecture](https://raw.githubusercontent.com/xDU00/blogstuff/refs/heads/main/archblog.png)
 
-### Step 1: Set Up the Virtual Environment
-1. **Create a Virtual Machine**:
-   - Use a hypervisor like VMware Workstation to create a VM with the specifications above.
-   - Install Ubuntu 20.04 LTS and update the system:
-     ```bash
-     sudo apt update && sudo apt upgrade -y
-     ```
-2. **Install Docker and Docker Compose**:
-   - Follow the official Docker installation guide for Ubuntu:
-     ```bash
-     sudo apt install docker.io docker-compose -y
-     sudo systemctl enable docker
-     sudo systemctl start docker
-     ```
-   - Verify installation:
-     ```bash
-     docker --version
-     docker-compose --version
-     ```
+## Setup
+### wazuh
+   - Run the services:
+   ![wazuhdeploy](https://raw.githubusercontent.com/xDU00/blogstuff/refs/heads/main/wazuh.png)
 
-### Step 2: Install and Configure Wazuh
-1. **Pull Wazuh Docker Images**:
-   - Use the official Wazuh Docker repository:
-     ```bash
-     docker pull wazuh/wazuh-manager:4.9.2
-     docker pull wazuh/wazuh-indexer:4.9.2
-     docker pull wazuh/wazuh-dashboard:4.9.2
-     ```
-2. **Configure Docker Compose**:
-   - Create a `docker-compose.yml` file for Wazuh:
-     ```yaml
-     version: '3'
-     services:
-       wazuh-manager:
-         image: wazuh/wazuh-manager:4.9.2
-         hostname: wazuh-manager
-         restart: always
-         networks:
-           - wazuh
-       wazuh-indexer:
-         image: wazuh/wazuh-indexer:4.9.2
-         hostname: wazuh-indexer
-         restart: always
-         networks:
-           - wazuh
-       wazuh-dashboard:
-         image: wazuh/wazuh-dashboard:4.9.2
-         hostname: wazuh-dashboard
-         restart: always
-         networks:
-           - wazuh
-         ports:
-           - "443:5601"
-     networks:
-       wazuh:
-         driver: bridge
-     ```
-   - **Explanation**: Maps the Wazuh dashboard to port 443 (HTTPS) for secure access, internally using port 5601.
-   - **Screenshot**:
+   - Access the Wazuh web interface at `https://<VM_IP>`
+   ![wazuhdeploy](https://raw.githubusercontent.com/xDU00/blogstuff/refs/heads/main/Capture_dcran_2025-02-19_184816.png)
 
-3. **Launch Wazuh**:
-   - Run the services in detached mode:
-     ```bash
-     docker-compose up -d
-     ```
-   - Verify containers are running:
-     ```bash
-     docker ps
-     ```
-4. **Install Wazuh Agents**:
-   - On each endpoint (Windows 10 and Ubuntu), download and install the Wazuh agent:
-     - **Windows**: Download the agent from [Wazuh](https://documentation.wazuh.com/current/installation-guide/wazuh-agent/windows.html) and follow the GUI installer.
-     - **Ubuntu**:
-       ```bash
-       wget https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.9.2-1_amd64.deb
-       sudo dpkg -i wazuh-agent_4.9.2-1_amd64.deb
-       ```
-   - Enroll agents with the Wazuh Manager:
-     ```bash
-     sudo /var/ossec/bin/manage_agents -i <MANAGER_IP>
-     ```
+### Install Wazuh Agents:
+   - choose the os and put the VM IP:
+   ![chooseos](https://raw.githubusercontent.com/xDU00/blogstuff/refs/heads/main/Screenshot_2025-02-19_191813.png)
+   - copy the command to your VM:
+   ![agentdeploy](https://raw.githubusercontent.com/xDU00/blogstuff/refs/heads/main/Screenshot%202025-06-01%20123426.png)
+   ![wazuhdeploy](https://raw.githubusercontent.com/xDU00/blogstuff/refs/heads/main/Screenshot%202025-06-01%20123332.png)
    - Verify agent status in the Wazuh Dashboard:
 
 
-### Step 3: Install and Configure DFIR-IRIS
-1. **Pull IRIS Docker Images**:
-   - Use the official IRIS Docker repository:
-     ```bash
-     docker pull dfiriris/iris-web-app:latest
-     ```
-2. **Configure Docker Compose**:
-   - Create a `docker-compose.yml` file for IRIS:
-     ```yaml
-     version: '3'
-     services:
-       iris_db:
-         image: postgres:13
-         environment:
-           - POSTGRES_USER=iris
-           - POSTGRES_PASSWORD=iris_password
-           - POSTGRES_DB=iris
-         networks:
-           - iris_network
-       iris_webapp:
-         image: dfiriris/iris-web-app:latest
-         depends_on:
-           - iris_db
-         ports:
-           - "8443:443"
-         environment:
-           - DB_HOST=iris_db
-           - DB_USER=iris
-           - DB_PASSWORD=iris_password
-           - DB_NAME=iris
-         networks:
-           - iris_network
-       iris_rabbitmq:
-         image: rabbitmq:3-management
-         networks:
-           - iris_network
-       iris_worker:
-         image: dfiriris/iris-web-app:latest
-         depends_on:
-           - iris_db
-           - iris_rabbitmq
-         environment:
-           - DB_HOST=iris_db
-           - DB_USER=iris
-           - DB_PASSWORD=iris_password
-           - DB_NAME=iris
-         networks:
-           - iris_network
-     networks:
-       iris_network:
-         driver: bridge
-     ```
-   - **Explanation**: Maps the IRIS web interface to port 8443 (HTTPS) for secure access.
-3. **Launch IRIS**:
+### DFIR-IRIS 
    - Run the services:
-     ```bash
-     docker-compose up -d
-     ```
-   - Verify containers are running:
-
+   ![wazuhdeploy](https://raw.githubusercontent.com/xDU00/blogstuff/refs/heads/main/Screenshot%202025-06-18%20005108.png)
    - Access the IRIS web interface at `https://<VM_IP>:8443`.
-4. **Integrate with Wazuh**:
+### Integrate with Wazuh:
    - Create a script to automate Wazuh-IRIS integration:
      ```bash
      #!/bin/bash
@@ -232,78 +70,12 @@ Before starting, ensure you have:
      chmod +x integrate_wazuh_iris.sh
      ./integrate_wazuh_iris.sh
      ```
-   - **Screenshot**:
+   
 
 
-### Step 4: Install and Configure Shuffle
-1. **Pull Shuffle Docker Images**:
-   - Use the official Shuffle Docker repository:
-     ```bash
-     docker pull shuffler/shuffle-backend:latest
-     docker pull shuffler/shuffle-frontend:latest
-     docker pull shuffler/shuffle-opensearch:latest
-     docker pull shuffler/shuffle-orborus:latest
-     ```
-2. **Configure Docker Compose**:
-   - Create a `docker-compose.yml` file for Shuffle:
-     ```yaml
-     version: '3'
-     services:
-       shuffle-backend:
-         image: shuffler/shuffle-backend:latest
-         hostname: shuffle-backend
-         restart: always
-         environment:
-           - BASE_URL=http://shuffle-backend:5001
-           - BACKEND_PORT=5001
-         networks:
-           - shuffle_network
-       shuffle-frontend:
-         image: shuffler/shuffle-frontend:latest
-         hostname: shuffle-frontend
-         restart: always
-         ports:
-           - "3443:3001"
-         environment:
-           - FRONTEND_PORT_HTTPS=3443
-         networks:
-           - shuffle_network
-       shuffle-opensearch:
-         image: shuffler/shuffle-opensearch:latest
-         hostname: shuffle-opensearch
-         restart: always
-         networks:
-           - shuffle_network
-       shuffle-orborus:
-         image: shuffler/shuffle-orborus:latest
-         hostname: shuffle-orborus
-         restart: always
-         networks:
-           - shuffle_network
-     networks:
-       shuffle_network:
-         driver: bridge
-     ```
-   - **Explanation**: Maps the Shuffle frontend to port 3443 (HTTPS) and backend to port 5001.
-3. **Configure Environment File**:
-   - Create an `env` file in the Shuffle directory:
-     ```bash
-     BASE_URL=http://shuffle-backend:5001
-     SSO_REDIRECT_URL=http://localhost:3001
-     BACKEND_HOSTNAME=shuffle-backend
-     BACKEND_PORT=5001
-     FRONTEND_PORT=3001
-     FRONTEND_PORT_HTTPS=3443
-     ```
-   - **Screenshot**:
-
-4. **Launch Shuffle**:
+### Shuffle
    - Run the services:
-     ```bash
-     docker-compose up -d
-     ```
-   - Verify containers are running:
-
+   ![shuffle](https://raw.githubusercontent.com/xDU00/blogstuff/refs/heads/main/shuffleisntal.png)
    - Access the Shuffle web interface at `https://<VM_IP>:3443`.
 5. **Integrate with Wazuh**:
    - Create a script to configure webhook notifications:
@@ -329,7 +101,6 @@ Before starting, ensure you have:
      chmod +x integrate_shuffle_wazuh.sh
      ./integrate_shuffle_wazuh.sh
      ```
-   - **Screenshot**:
 
 6. **Integrate with IRIS and VirusTotal**:
    - In the Shuffle web interface, create a workflow:
@@ -337,21 +108,9 @@ Before starting, ensure you have:
      - **Actions**:
        - Add a VirusTotal module to query file hashes (configure with your VirusTotal API key).
        - Add an IRIS module to create cases (configure with IRIS API key and URL).
-       - Add an email module to notify the SOC team (configure with SMTP settings).
-   - Example JSON for IRIS case creation:
-     ```json
-     {
-       "case_customer": "1",
-       "case_description": "${create_alert.body.data.alert_description}",
-       "case_name": "${exec.title}",
-       "soc_id": "shuffler2",
-       "case_id": "1"
-     }
-     ```
-   - **Screenshots**:
    
 
-### Step 5: Test the SOC with a Mimikatz Attack Scenario
+### Test the SOC with a Mimikatz Attack Scenario
 To validate the automated SOC, simulate a credential-dumping attack using Mimikatz, a common post-exploitation tool.
 
 1. **Set Up Test Environment**:
