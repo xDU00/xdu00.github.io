@@ -37,7 +37,7 @@ This guide provides a step-by-step approach to building such a system, including
    - Access the Wazuh web interface at `https://<VM_IP>`
    ![wazuhdeploy](https://raw.githubusercontent.com/xDU00/blogstuff/refs/heads/main/Capture_dcran_2025-02-19_184816.png)
 
-## Install Wazuh Agents:
+### Install Wazuh Agents:
    - choose the os and put the VM IP:
    ![chooseos](https://raw.githubusercontent.com/xDU00/blogstuff/refs/heads/main/Screenshot_2025-02-19_191813.png)
    - copy the command to your VM:
