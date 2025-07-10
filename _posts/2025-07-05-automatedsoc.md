@@ -1,7 +1,13 @@
-# Building an Automated SOC with Open-Source Tools (Wazuh, VirusTotal, DFIR-IRIS, Shuffle)
+---
+title: Building an Automated SOC with Open-Source Tools (Wazuh, VirusTotal, DFIR-IRIS, Shuffle)
+categories: [SOC LABS]
+tags: [forensics, SOC]
+image: https://raw.githubusercontent.com/xDU00/blogstuff/refs/heads/main/0_95jwPCsxkDj40Mgo.png
+---
 
+# Introduction
 This guide walks you through creating a next-generation Security Operations Center (SOC) using open-source tools: **Wazuh** for Security Information and Event Management (SIEM), **VirusTotal** for threat intelligence, **Shuffle** for Security Orchestration, Automation, and Response (SOAR), and **DFIR-IRIS** for incident management and collaboration. By integrating these tools, you can automate threat detection, enrichment, and response, significantly improving SOC efficiency. This setup is based on a real-world project implemented.
-## Why Automate a SOC?
+# Why Automate a SOC?
 
 Modern cybersecurity threats are frequent and sophisticated, overwhelming traditional SOCs with alert fatigue, manual processes, and delayed responses. A next-generation SOC leverages automation, orchestration, and threat intelligence to:
 - **Enhance Visibility**: Monitor endpoints, networks, and cloud environments in real-time.
@@ -10,7 +16,7 @@ Modern cybersecurity threats are frequent and sophisticated, overwhelming tradit
 - **Ensure Compliance**: Maintain audit logs and centralized reporting for regulations like GDPR and PCI DSS.
 
 This guide provides a step-by-step approach to building such a system, including setup, configuration, integration, and testing with a realistic attack scenario, complete with screenshots to illustrate key steps.
-## Prerequisites
+# Prerequisites
 
 - I used a single virtual machine (VM) with:
   - **OS**: Ubuntu 20.04 LTS (Kernel 5.15 or later)
@@ -20,18 +26,18 @@ This guide provides a step-by-step approach to building such a system, including
 - you can use a VM for each tool
 - Docker and Docker Compose installed on the VM.
 - A test environment with Windows 10 and Ubuntu endpoints for monitoring.
-## Architecture Overview
+# Architecture Overview
 ![architecture](https://raw.githubusercontent.com/xDU00/blogstuff/refs/heads/main/archblog.png)
 
-## Setup
-### wazuh
+# Setup
+## wazuh
    - Run the services:
    ![wazuhdeploy](https://raw.githubusercontent.com/xDU00/blogstuff/refs/heads/main/wazuh.png)
 
    - Access the Wazuh web interface at `https://<VM_IP>`
    ![wazuhdeploy](https://raw.githubusercontent.com/xDU00/blogstuff/refs/heads/main/Capture_dcran_2025-02-19_184816.png)
 
-### Install Wazuh Agents:
+## Install Wazuh Agents:
    - choose the os and put the VM IP:
    ![chooseos](https://raw.githubusercontent.com/xDU00/blogstuff/refs/heads/main/Screenshot_2025-02-19_191813.png)
    - copy the command to your VM:
@@ -40,11 +46,11 @@ This guide provides a step-by-step approach to building such a system, including
    - Verify agent status in the Wazuh Dashboard:
 
 
-### DFIR-IRIS 
+## DFIR-IRIS 
    - Run the services:
    ![wazuhdeploy](https://raw.githubusercontent.com/xDU00/blogstuff/refs/heads/main/Screenshot%202025-06-18%20005108.png)
    - Access the IRIS web interface at `https://<VM_IP>:8443`.
-### Integrate with Wazuh:
+### Integrate DFIR-IRIS with Wazuh:
    - Create a script to automate Wazuh-IRIS integration:
      ```bash
      #!/bin/bash
@@ -73,11 +79,11 @@ This guide provides a step-by-step approach to building such a system, including
    
 
 
-### Shuffle
+## Shuffle
    - Run the services:
    ![shuffle](https://raw.githubusercontent.com/xDU00/blogstuff/refs/heads/main/shuffleisntal.png)
    - Access the Shuffle web interface at `https://<VM_IP>:3443`.
-5. **Integrate with Wazuh**:
+### Integrate Shuffle with Wazuh
    - Create a script to configure webhook notifications:
      ```bash
      #!/bin/bash
@@ -102,7 +108,7 @@ This guide provides a step-by-step approach to building such a system, including
      ./integrate_shuffle_wazuh.sh
      ```
 
-6. **Integrate with IRIS and VirusTotal**:
+## Integrate with IRIS and VirusTotal
    - In the Shuffle web interface, create a workflow:
      - **Trigger**: Configure a Wazuh webhook trigger (use the hook URL from above).
      - **Actions**:
