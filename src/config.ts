@@ -30,9 +30,9 @@ export const siteConfig: SiteConfig = {
     // 站点 URL（以斜杠结尾）
     siteURL: "https://xdu00.github.io", // 请替换为你的站点 URL 并以斜杠结尾
     // 站点标题
-    title: "Twilight",
+    title: "xDU0",
     // 站点副标题
-    subtitle: "Blog Template",
+    subtitle: "Blog",
     // 语言配置
     lang: SITE_LANG, // 自动检测的浏览器语言
     // 翻译配置
@@ -84,11 +84,11 @@ export const siteConfig: SiteConfig = {
         src: {
             // 桌面壁纸图片 (支持单张图片或图片数组，当数组长度 > 1 时自动启用轮播)
             desktop: [
-                "/assets/desktop-banner/desktopBanner_1.webp",
+                "/assets/desktop-banner/dgctbqh-5901ad2a-f5c8-47a1-a7b4-d286ff470f0f.jpg",
             ],
             // 移动壁纸图片 (支持单张图片或图片数组，当数组长度 > 1 时自动启用轮播)
             mobile: [
-                "/assets/mobile-banner/mobileBanner_1.webp",
+                "/assets/mobile-banner/skibdi.png",
             ],
         },
         // 壁纸位置 ('top' | 'center' | 'bottom')
@@ -114,10 +114,10 @@ export const siteConfig: SiteConfig = {
                 // 在主页显示文本
                 enable: true,
                 // 主标题
-                title: "Twilight",
+                title: "xDU0 Blog",
                 // 副标题，支持单个字符串或字符串数组
                 subtitle: [
-                    "Illuminate Our Paths",
+                    "skibidi your life",
                 ],
                 // 副标题打字机效果
                 typewriter: {
@@ -170,7 +170,8 @@ export const siteConfig: SiteConfig = {
     // OpenGraph 配置
     generateOgImages: false, // 注意开启图片生成后要渲染很长时间，不建议本地调试的时候开启
     // favicon 配置
-    favicon: [
+    favicon: [{
+        src: '/assets/brain.png',}
     ],
     // bangumi 配置
     bangumi: {
@@ -189,6 +190,7 @@ export const navBarConfig: NavBarConfig = {
     links: [
         LinkPreset.Home,
         LinkPreset.Archive,
+        LinkPreset.About,
         {
             name: "Links",
             url: "/links/",
@@ -201,33 +203,24 @@ export const navBarConfig: NavBarConfig = {
                     icon: "fa6-brands:github",
                 },
                 {
-                    name: "Bilibili",
-                    url: "https://space.bilibili.com/Example",
+                    name: "linkedin",
+                    url: "https://www.linkedin.com/in/hilmi-ouelhazi/",
                     external: true,
-                    icon: "fa6-brands:bilibili",
+                    icon: "fa6-brands:linkedin",
                 },
             ],
         },
         {
-            name: "My",
+            name: "Other",
             url: "/content/",
             icon: "material-symbols:person",
             children: [
-                LinkPreset.Projects,
-                LinkPreset.Skills,
-                LinkPreset.Timeline,
+                //LinkPreset.Projects,
+                //LinkPreset.Skills,
+                //LinkPreset.Timeline,
                 LinkPreset.Diary,
-                LinkPreset.Albums,
+                //LinkPreset.Albums,
                 LinkPreset.Anime,
-            ],
-        },
-        {
-            name: "About",
-            url: "/content/",
-            icon: "material-symbols:info",
-            children: [
-                LinkPreset.About,
-                LinkPreset.Friends,
             ],
         },
     ],
@@ -260,11 +253,11 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
         {
             // 组件类型
             type: "announcement", // 公告组件
-            // 是否启用该组件
+            // 是否启用该组件 (现在通过统一配置控制)
             enable: true,
             // 组件所属侧边栏
             side: "left",
-            // 组件显示顺序 (数字越小越靠前)
+            // 组件显示顺序
             order: 2,
             // 组件位置
             position: "top", // 固定在顶部
@@ -279,8 +272,8 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
             // 是否启用该组件
             enable: true,
             // 组件所属侧边栏
-            side: "left",
-            // 组件显示顺序 (数字越小越靠前)
+            side: "right",
+            // 组件显示顺序
             order: 3,
             // 组件位置
             position: "sticky", // 粘性定位，可滚动
@@ -300,15 +293,15 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
             // 是否启用该组件
             enable: true,
             // 组件所属侧边栏
-            side: "left",
-            // 组件显示顺序 (数字越小越靠前)
+            side: "right",
+            // 组件显示顺序
             order: 4,
             // 组件位置
             position: "sticky", // 粘性定位，可滚动
             // CSS 类名
             class: "onload-animation",
             // 动画延迟时间
-            animationDelay: 200,
+            animationDelay: 250,
             // 响应式配置
             responsive: {
                 // 折叠阈值
@@ -356,17 +349,17 @@ export const umamiConfig = {
 // 资料配置
 export const profileConfig: ProfileConfig = {
     // 头像配置 (相对于 /src 目录。如果以 '/' 开头，则相对于 /public 目录)
-    avatar: "assets/images/avatar.png",
+    avatar: "assets/images/avatar.jpg",
     // 信息配置
-    name: "Twilight",
+    name: "xDU0",
     // 简介配置
-    bio: "Hi",
+    bio: "Cyber Security Enthusiast | CTF Player",
     // 链接配置
     links: [
         {
             name: "GitHub",
             icon: "fa6-brands:github",
-            url: "https://github.com/Spr-Aachen/Twilight",
+            url: "https://github.com/xDU00",
         },
     ],
 };
@@ -579,3 +572,17 @@ export const pioConfig: import("./types/config").PioConfig = {
         link: "https://nav.kungal.org",
     },
 };
+
+/**
+ * 
+ */
+
+// 导出所有配置的统一接口
+export const widgetConfigs = {
+    profile: profileConfig,
+    announcement: announcementConfig,
+    layout: sidebarLayoutConfig,
+    particle: particleConfig,
+    music: musicPlayerConfig,
+    pio: pioConfig,
+} as const;
