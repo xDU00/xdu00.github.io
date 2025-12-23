@@ -1,5 +1,9 @@
-# About This Site
+# About Me
 
-This website is built with the **Astro** framework using the [Twilight](https://github.com/Spr-Aachen/Twilight) template.
+I'm a cyber security student and CTF player  with a big interest in Digital Forensics, Incident Response and blue team. Currently a CTF player for @[Phr34k$](https://phr34ks.xyz/) .
+ Through this blog, I share my experiences, insights, and personal achievements. Stay tuned for regular updates and feel free to connect with me!
 
-::github{repo="Spr-Aachen/Twilight"}
+# Contact
+
+- **Discord:** xduo28_
+- **[Github](https://github.com/xDU00)**
