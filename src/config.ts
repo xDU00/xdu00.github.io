@@ -28,7 +28,7 @@ const SITE_TIMEZONE = 8; // from -12 to 12 default in UTC+8
 // 站点配置
 export const siteConfig: SiteConfig = {
     // 站点 URL（以斜杠结尾）
-    siteURL: "https://twilight.spr-aachen.com/", // 请替换为你的站点 URL 并以斜杠结尾
+    siteURL: "https://xdu00.github.io/", // 请替换为你的站点 URL 并以斜杠结尾
     // 站点标题
     title: "Twilight",
     // 站点副标题
