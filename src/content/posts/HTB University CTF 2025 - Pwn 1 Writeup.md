@@ -214,6 +214,6 @@ echo -ne "\xC1\xE3\x10" | nc 154.57.164.67 30831
 ```
 CTF{sh1ft_l3ft_1337_r3g1st3r}
 ```
-![alt text](./img/skibidi.png)
+![alt text](./img/skibdi.png)
 ---
 
