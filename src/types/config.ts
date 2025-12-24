@@ -160,7 +160,9 @@ export type SiteConfig = {
     // OpenGraph 配置
     generateOgImages: boolean;
     // Favicon 配置
-    favicon: Favicon[];
+    favicon: Favicon[
+        
+    ];
     // bangumi 配置
     bangumi?: {
         // 用户 ID

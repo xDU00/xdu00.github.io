@@ -171,7 +171,7 @@ export const siteConfig: SiteConfig = {
     generateOgImages: false, // 注意开启图片生成后要渲染很长时间，不建议本地调试的时候开启
     // favicon 配置
     favicon: [{
-        src: '/assets/brain.png',}
+        src: '/assets/Ciastko.png',}
     ],
     // bangumi 配置
     bangumi: {
