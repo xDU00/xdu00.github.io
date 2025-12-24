@@ -361,6 +361,11 @@ export const profileConfig: ProfileConfig = {
             icon: "fa6-brands:github",
             url: "https://github.com/xDU00",
         },
+        {
+            name: "linkedin",
+            icon: "fa6-brands:linkedin",
+            url: "https://www.linkedin.com/in/hilmi-ouelhazi/",
+        },
     ],
 };
 
