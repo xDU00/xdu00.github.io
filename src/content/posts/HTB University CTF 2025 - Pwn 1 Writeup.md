@@ -213,7 +213,7 @@ echo -ne "\xC1\xE3\x10" | nc 154.57.164.67 30831
 ## Flag
 
 ```
-CTF{sh1ft_l3ft_1337_r3g1st3r}
+HTB{sh1ft_2_th3_l3ft_sh1ft_2_th3_right_deb9dab93d244e694e4432c4d8db6862}
 ```
 ![alt text](./img/skibdi.png)
 ---
