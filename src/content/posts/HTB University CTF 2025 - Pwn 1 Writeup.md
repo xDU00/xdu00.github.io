@@ -197,7 +197,8 @@ ret
 Machine code:
 
 ```
-C1 E3 10 C3```
+C1 E3 10 C3
+```
 
 ---
 
