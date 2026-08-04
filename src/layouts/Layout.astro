@@ -116,6 +116,11 @@ const bannerOffset =
 
 const umamiEnabled = umamiConfig.enabled || false;
 const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
+const defaultDescription =
+    "xDU0 publishes cybersecurity notes, CTF writeups, DFIR walkthroughs, blue team practice, and binary exploitation research.";
+const metaDescription = description || defaultDescription;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const defaultOgImage = new URL(getDefaultBanner(), Astro.site).toString();
 ---
 
 <!DOCTYPE html>
@@ -143,17 +148,21 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
         <title>{pageTitle}</title>
 
         <meta charset="UTF-8" />
-        <meta name="description" content={description || pageTitle}>
+        <meta name="description" content={metaDescription}>
         {siteConfig.keywords && siteConfig.keywords.length > 0 && (
             <meta name="keywords" content={siteConfig.keywords.join(', ')} />
         )}
         <meta name="author" content={profileConfig.name}>
+        <meta name="theme-color" content={`oklch(0.7 0.14 ${configHue})`}>
+        <link rel="canonical" href={canonicalUrl}>
 
         <meta property="og:site_name" content={siteConfig.title}>
-        <meta property="og:url" content={Astro.url}>
+        <meta property="og:url" content={canonicalUrl}>
         <meta property="og:title" content={pageTitle}>
-        <meta property="og:description" content={description || pageTitle}>
-        {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+        <meta property="og:description" content={metaDescription}>
+        <meta property="og:locale" content={siteLang}>
+        <meta property="og:image" content={ogImageUrl || defaultOgImage} />
+        <meta property="og:image:alt" content={`${siteConfig.title} blog banner`} />
         {
             setOGTypeArticle ? (
                 <meta property="og:type" content="article" />
@@ -163,11 +172,12 @@ const umamiScripts = umamiConfig.scripts || ""; // 获取Umami scripts配置
         }
 
         <meta name="twitter:card" content="summary_large_image">
-        <meta property="twitter:url" content={Astro.url}>
+        <meta property="twitter:url" content={canonicalUrl}>
         <meta name="twitter:title" content={pageTitle}>
-        <meta name="twitter:description" content={description || pageTitle}>
+        <meta name="twitter:description" content={metaDescription}>
+        <meta name="twitter:image" content={ogImageUrl || defaultOgImage}>
 
-        <meta name="viewport" content="width=device-width" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="generator" content={Astro.generator} />
         {favicons.map(favicon => (
             <link rel="icon"

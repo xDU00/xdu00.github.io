@@ -28,11 +28,22 @@ const SITE_TIMEZONE = 8; // from -12 to 12 default in UTC+8
 // 站点配置
 export const siteConfig: SiteConfig = {
     // 站点 URL（以斜杠结尾）
-    siteURL: "https://xdu00.github.io", // 请替换为你的站点 URL 并以斜杠结尾
+    siteURL: "https://xdu00.github.io/",
     // 站点标题
     title: "xDU0",
     // 站点副标题
-    subtitle: "Blog",
+    subtitle: "Cybersecurity Notes and CTF Writeups",
+    // SEO keywords
+    keywords: [
+        "xDU0",
+        "cybersecurity",
+        "CTF writeups",
+        "digital forensics",
+        "incident response",
+        "binary exploitation",
+        "pwn",
+        "blue team",
+    ],
     // 语言配置
     lang: SITE_LANG, // 自动检测的浏览器语言
     // 翻译配置
@@ -117,7 +128,8 @@ export const siteConfig: SiteConfig = {
                 title: "xDU0 Blog",
                 // 副标题，支持单个字符串或字符串数组
                 subtitle: [
-                    "skibidi your life",
+                    "CTF writeups, DFIR notes, and blue team practice",
+                    "Binary exploitation and security lab writeups",
                 ],
                 // 副标题打字机效果
                 typewriter: {
@@ -190,6 +202,18 @@ export const navBarConfig: NavBarConfig = {
     links: [
         LinkPreset.Home,
         LinkPreset.Archive,
+        {
+            name: "Labs",
+            url: "/labs/",
+            icon: "material-symbols:science-outline",
+            children: [
+                {
+                    name: "CyberDefenders",
+                    url: "/labs/cyberdefenders/",
+                    icon: "material-symbols:shield-outline",
+                },
+            ],
+        },
         LinkPreset.About,
         {
             name: "Links",
@@ -198,7 +222,7 @@ export const navBarConfig: NavBarConfig = {
             children: [
                 {
                     name: "GitHub",
-                    url: "https://github.com/Example",
+                    url: "https://github.com/xDU00",
                     external: true,
                     icon: "fa6-brands:github",
                 },
@@ -353,7 +377,7 @@ export const profileConfig: ProfileConfig = {
     // 信息配置
     name: "xDU0",
     // 简介配置
-    bio: "Cyber Security Enthusiast | CTF Player",
+    bio: "Cybersecurity Student | DFIR & Blue Team | CTF Player",
     // 链接配置
     links: [
         {
@@ -375,7 +399,7 @@ export const announcementConfig: AnnouncementConfig = {
     // 公告标题
     title: "Announcement",
     // 公告内容
-    content: "Welcome to my blog!",
+    content: "CTF writeups, DFIR notes, and security research logs.",
     // 允许用户关闭公告
     closable: true,
     // 链接配置

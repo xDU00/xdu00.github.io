@@ -44,6 +44,8 @@ function formatTag(tagList: string[]) {
 }
 
 onMount(async () => {
+    document.getElementById("archive-static")?.setAttribute("hidden", "");
+
     let filteredPosts: Post[] = sortedPosts;
 
     if (tags.length > 0) {
