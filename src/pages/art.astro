@@ -1,0 +1,84 @@
+---
+import type { ImageMetadata } from "astro";
+import { Icon } from "astro-icon/components";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+
+// Drop your art images into src/assets/art/ — they appear here automatically.
+const imageModules = import.meta.glob<{ default: ImageMetadata }>(
+    "../assets/art/*.{png,jpg,jpeg,gif,webp,avif}",
+    { eager: true },
+);
+
+const artworks = Object.entries(imageModules).map(([path, mod]) => {
+    const filename = path.split("/").pop() ?? "artwork";
+    return {
+        src: mod.default.src,
+        title: filename.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " "),
+    };
+});
+
+const hasArtworks = artworks.length > 0;
+---
+
+<MainGridLayout title="Art" description="My artwork and illustrations">
+    <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
+        <div class="card-base z-10 px-4 py-4 md:px-6 md:py-5 relative w-full">
+            <div class="relative max-w-5xl mx-auto">
+                <div class="mb-6">
+                    <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-90 mb-1">Art</h1>
+                    <p class="text-sm md:text-base text-75">Some of my artwork and illustrations.</p>
+                </div>
+
+                {hasArtworks ? (
+                    <div class="art-gallery">
+                        {artworks.map((artwork) => (
+                            <figure class="art-item">
+                                <img
+                                    src={artwork.src}
+                                    alt={artwork.title}
+                                    loading="lazy"
+                                    decoding="async"
+                                />
+                                <figcaption class="art-caption text-75">{artwork.title}</figcaption>
+                            </figure>
+                        ))}
+                    </div>
+                ) : (
+                    <div class="text-center py-16">
+                        <Icon name="material-symbols:palette-outline" class="text-5xl mb-3 opacity-40" />
+                        <p class="text-75">Nothing here yet — artwork coming soon.</p>
+                    </div>
+                )}
+            </div>
+        </div>
+    </div>
+</MainGridLayout>
+
+<style>
+    .card-base {
+        background: var(--card-bg);
+        border: 1px solid var(--line-divider);
+    }
+
+    .art-gallery {
+        columns: 3 240px;
+        column-gap: 1rem;
+    }
+
+    .art-item {
+        break-inside: avoid;
+        margin: 0 0 1rem;
+    }
+
+    .art-item img {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 8px;
+    }
+
+    .art-caption {
+        margin-top: 0.4rem;
+        font-size: 0.85rem;
+    }
+</style>

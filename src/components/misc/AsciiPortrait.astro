@@ -1,0 +1,291 @@
+---
+import type { ImageMetadata } from "astro";
+
+
+interface Props {
+    // Path relative to /src (e.g. "assets/images/avatar.png")
+    src: string;
+    alt?: string;
+    class?: string;
+}
+
+const { src, alt = "", class: className = "" } = Astro.props;
+
+// Resolve the local image through Astro's asset pipeline (same source the
+// <img> would use), so the canvas can sample its pixels.
+const imageFiles = import.meta.glob<ImageMetadata>("/src/**/*.{png,jpg,jpeg,webp,gif,avif}", {
+    eager: true,
+    import: "default",
+});
+const meta = imageFiles[`/src/${src}`];
+const imageUrl = meta?.src ?? src;
+const imageWidth = meta?.width ?? 1;
+const imageHeight = meta?.height ?? 1;
+---
+
+<div
+    class:list={[className, "ascii-portrait"]}
+    style={`aspect-ratio: ${imageWidth} / ${imageHeight}`}
+    data-portrait-src={imageUrl}
+>
+    <canvas class="ascii-portrait-canvas" role="img" aria-label={alt}></canvas>
+</div>
+
+<script>
+type Cell = {
+    gx: number;  // grid column (for deterministic hashing)
+    gy: number;  // grid row
+    px: number;  // center x in CSS px
+    py: number;  // center y in CSS px
+    char: string; // settled ASCII character
+    alpha: number; // 0..1 opacity
+    delay: number; // scramble start delay (ms), set on hover
+};
+
+// Densest char = black pixel; sparsest char = white pixel.
+const RAMP = "@%#*+=-:. ";
+const SCRAMBLE_CHARS = "!@#$%&*()_+-=[]{};:,.<>/?~|\\";
+
+function hash01(n: number): number {
+    n = Math.imul(n ^ (n >>> 16), 0x45d9f3b);
+    n = Math.imul(n ^ (n >>> 16), 0x45d9f3b);
+    n ^= n >>> 16;
+    return (n >>> 0) / 4294967296;
+}
+
+function initAsciiPortraits() {
+    document.querySelectorAll(".ascii-portrait").forEach((root) => {
+        if (root.hasAttribute("data-portrait-ready")) return;
+        root.setAttribute("data-portrait-ready", "");
+        setupAsciiPortrait(root);
+    });
+}
+
+function setupAsciiPortrait(root: Element) {
+    const canvas = root.querySelector("canvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const src = root.getAttribute("data-portrait-src") || "";
+
+    // --- hardcoded defaults ---
+    const CHAR_COLOR = "#2dd4bf";
+    const BG_COLOR = "#000000";
+    const TARGET_COLS = 46;        // ASCII grid resolution
+    const CHAR_ASPECT = 0.6;       // monospace char width / height
+    const ALPHA_THRESHOLD = 16;    // skip fully transparent pixels
+    const WAVE_DURATION = 480;     // ms for the scramble wave to travel
+    const SETTLE_DURATION = 280;   // ms a char scrambles before settling
+    const FLICKER_INTERVAL = 60;   // ms between scramble char changes
+
+    let cells: Cell[] = [];
+    let loadedImg: HTMLImageElement | null = null;
+    let started = false;
+    let rafId = 0;
+    let size = { w: 0, h: 0, dpr: 1, fontSize: 8, charW: 5, charH: 8 };
+    let resizePending = false;
+
+    // hover state
+    let hovered = false;
+    let scrambleStart = -1e9;
+    let origin = { x: 0, y: 0 };
+
+    function loadImage(url: string): Promise<HTMLImageElement> {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = reject;
+            img.src = url;
+        });
+    }
+
+    function buildCells(img: HTMLImageElement): Cell[] {
+        const { w, h } = size;
+        const fontSize = Math.max(5, w / TARGET_COLS);
+        const charW = fontSize * CHAR_ASPECT;
+        const charH = fontSize;
+        const cols = Math.max(1, Math.floor(w / charW));
+        const rows = Math.max(1, Math.floor(h / charH));
+        size.fontSize = fontSize;
+        size.charW = charW;
+        size.charH = charH;
+
+        // Downsample the image to one pixel per character cell.
+        const off = document.createElement("canvas");
+        off.width = cols;
+        off.height = rows;
+        const octx = off.getContext("2d", { willReadFrequently: true });
+        if (!octx) return [];
+        octx.drawImage(img, 0, 0, cols, rows);
+        const data = octx.getImageData(0, 0, cols, rows).data;
+
+        const list: Cell[] = [];
+        for (let gy = 0; gy < rows; gy++) {
+            for (let gx = 0; gx < cols; gx++) {
+                const i = (gy * cols + gx) * 4;
+                const alpha = data[i + 3];
+                if (alpha < ALPHA_THRESHOLD) continue;
+                const l = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+                const idx = Math.min(RAMP.length - 1, Math.floor((l / 255) * RAMP.length));
+                list.push({
+                    gx,
+                    gy,
+                    px: (gx + 0.5) * charW,
+                    py: (gy + 0.5) * charH,
+                    char: RAMP[idx],
+                    alpha: alpha / 255,
+                    delay: 0,
+                });
+            }
+        }
+        return list;
+    }
+
+    const resize = () => {
+        const rect = canvas.getBoundingClientRect();
+        const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+        const w = Math.max(1, rect.width);
+        const h = Math.max(1, rect.height);
+        if (Math.abs(w - size.w) < 0.5 && Math.abs(h - size.h) < 0.5 && dpr === size.dpr) return;
+        size = { w, h, dpr, fontSize: size.fontSize, charW: size.charW, charH: size.charH };
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    const rebuild = () => {
+        resize();
+        if (loadedImg && size.w) {
+            cells = buildCells(loadedImg);
+        }
+    };
+
+    const setOriginFromEvent = (e: MouseEvent) => {
+        const rect = canvas.getBoundingClientRect();
+        origin = {
+            x: Math.max(0, Math.min(rect.width, e.clientX - rect.left)),
+            y: Math.max(0, Math.min(rect.height, e.clientY - rect.top)),
+        };
+    }
+
+    function beginScramble() {
+        // Stagger each char by its distance from the hover point.
+        const { w, h } = size;
+        const maxDist = Math.hypot(w, h);
+        for (const c of cells) {
+            const d = Math.hypot(c.px - origin.x, c.py - origin.y);
+            c.delay = (d / maxDist) * WAVE_DURATION;
+        }
+        scrambleStart = performance.now();
+    }
+
+    const render = (now: number) => {
+        if (!size.w || !size.h) return;
+        ctx.fillStyle = BG_COLOR;
+        ctx.fillRect(0, 0, size.w, size.h);
+        ctx.font = `${size.fontSize}px monospace`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        const t = now - scrambleStart;
+        for (const c of cells) {
+            let ch = c.char;
+            let alpha = c.alpha;
+            const local = t - c.delay;
+            if (hovered && local > 0 && local < SETTLE_DURATION) {
+                const flick = Math.floor(local / FLICKER_INTERVAL);
+                const r = hash01(c.gx * 374761393 + c.gy * 668265263 + flick * 1442695041);
+                ch = SCRAMBLE_CHARS[Math.floor(r * SCRAMBLE_CHARS.length)];
+                alpha *= 0.55; // dimmed while scrambling
+            }
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = CHAR_COLOR;
+            ctx.fillText(ch, c.px, c.py);
+        }
+        ctx.globalAlpha = 1;
+
+        rafId = requestAnimationFrame(render);
+    }
+
+    async function load() {
+        if (!src) return;
+        try {
+            loadedImg = await loadImage(src);
+            rebuild();
+            started = true;
+            cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(render);
+        } catch (err) {
+            console.error("AsciiPortrait: failed to load image", src, err);
+        }
+    }
+
+    function scheduleResize() {
+        if (resizePending) return;
+        resizePending = true;
+        requestAnimationFrame(() => {
+            resizePending = false;
+            if (started) rebuild();
+        });
+    }
+
+    root.addEventListener("mouseenter", (e: MouseEvent) => {
+        hovered = true;
+        setOriginFromEvent(e);
+        beginScramble();
+    });
+    root.addEventListener("mousemove", (e: MouseEvent) => {
+        if (!hovered) return;
+        setOriginFromEvent(e);
+    });
+    root.addEventListener("mouseleave", () => {
+        hovered = false;
+    });
+    root.addEventListener("touchstart", (e: TouchEvent) => {
+        hovered = true;
+        const t = e.touches[0];
+        if (t) {
+            const rect = canvas.getBoundingClientRect();
+            origin = {
+                x: Math.max(0, Math.min(rect.width, t.clientX - rect.left)),
+                y: Math.max(0, Math.min(rect.height, t.clientY - rect.top)),
+            };
+        }
+        beginScramble();
+        window.setTimeout(() => {
+            hovered = false;
+        }, WAVE_DURATION + SETTLE_DURATION + 100);
+    });
+
+    if (typeof ResizeObserver !== "undefined") {
+        new ResizeObserver(scheduleResize).observe(root);
+    } else {
+        window.addEventListener("resize", scheduleResize);
+    }
+
+    load();
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initAsciiPortraits);
+} else {
+    initAsciiPortraits();
+}
+</script>
+
+<style>
+    .ascii-portrait {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        background: #000000;
+    }
+
+    .ascii-portrait-canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: #000000;
+    }
+</style>

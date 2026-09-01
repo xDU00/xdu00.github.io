@@ -1,8 +1,9 @@
 ---
 import { Icon } from "astro-icon/components";
 
-import { navBarConfig, siteConfig } from "@/config";
+import { navBarConfig, siteConfig, profileConfig } from "@/config";
 import { LinkPresets } from "@constants/link-presets";
+import type { ImageMetadata } from "astro";
 import { LinkPreset, type NavBarLink } from "@/types/config";
 import { url } from "@utils/url-utils";
 import { getNavbarTransparentModeForWallpaperMode } from "@utils/setting-utils";
@@ -15,6 +16,13 @@ import DropdownMenu from "./widget/DropdownMenu.astro";
 import NavMenuPanel from "./widget/NavMenuPanel.astro";
 import TranslateButton from "./widget/TranslateButton.svelte";
 
+
+// Resolve the site logo (avatar) through the asset pipeline for the navbar mark.
+const logoFiles = import.meta.glob<ImageMetadata>("/src/**/*.{png,jpg,jpeg,webp,gif,avif}", {
+    eager: true,
+    import: "default",
+});
+const logoUrl = logoFiles[`/src/${profileConfig.avatar}`]?.src ?? profileConfig.avatar;
 
 const className = Astro.props.class;
 
@@ -41,7 +49,7 @@ let links: NavBarLink[] = navBarConfig.links.map(
         "!overflow-visible max-w-[var(--page-width)] h-[4.5rem] mx-auto flex items-center justify-between md:px-4"]}>
         <a href={url('/')} class="btn-plain scale-animation rounded-lg h-[3.25rem] px-5 font-bold active:scale-95">
             <div class="flex flex-row text-[var(--primary)] items-center text-md">
-                <Icon name="material-symbols:home-pin-outline" class="text-[1.75rem] mb-1 mr-2" />
+                <span class="nav-logo mb-1 mr-2" style={`-webkit-mask-image:url("${logoUrl}");mask-image:url("${logoUrl}")`}></span>
                 {siteConfig.title}
             </div>
         </a>
@@ -199,3 +207,18 @@ if (document.readyState === 'loading') {
     loadPagefind();
 }
 </script>}
+
+<style>
+    .nav-logo {
+        display: inline-block;
+        width: 1.75rem;
+        height: 1.75rem;
+        background-color: var(--primary);
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+    }
+</style>

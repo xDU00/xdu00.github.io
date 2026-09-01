@@ -201,7 +201,7 @@ export const navBarConfig: NavBarConfig = {
     // 链接配置 (支持多级菜单)
     links: [
         LinkPreset.Home,
-        LinkPreset.Archive,
+        LinkPreset.About,
         {
             name: "Labs",
             url: "/labs/",
@@ -214,39 +214,20 @@ export const navBarConfig: NavBarConfig = {
                 },
             ],
         },
-        LinkPreset.About,
         {
-            name: "Links",
-            url: "/links/",
-            icon: "material-symbols:link",
-            children: [
-                {
-                    name: "GitHub",
-                    url: "https://github.com/xDU00",
-                    external: true,
-                    icon: "fa6-brands:github",
-                },
-                {
-                    name: "linkedin",
-                    url: "https://www.linkedin.com/in/hilmi-ouelhazi/",
-                    external: true,
-                    icon: "fa6-brands:linkedin",
-                },
-            ],
+            name: "Art",
+            url: "/art/",
+            icon: "material-symbols:palette-outline",
         },
         {
             name: "Other",
             url: "/content/",
             icon: "material-symbols:person",
             children: [
-                //LinkPreset.Projects,
-                //LinkPreset.Skills,
-                //LinkPreset.Timeline,
-                LinkPreset.Diary,
-                //LinkPreset.Albums,
                 LinkPreset.Anime,
             ],
         },
+        LinkPreset.Archive,
     ],
 };
 
@@ -278,7 +259,7 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
             // 组件类型
             type: "announcement", // 公告组件
             // 是否启用该组件 (现在通过统一配置控制)
-            enable: true,
+            enable: false,
             // 组件所属侧边栏
             side: "left",
             // 组件显示顺序
@@ -373,7 +354,7 @@ export const umamiConfig = {
 // 资料配置
 export const profileConfig: ProfileConfig = {
     // 头像配置 (相对于 /src 目录。如果以 '/' 开头，则相对于 /public 目录)
-    avatar: "assets/images/avatar.jpg",
+    avatar: "assets/images/Gemini_Generated_Image_1zbzqk1zbzqk1zbz.png",
     // 信息配置
     name: "xDU0",
     // 简介配置
