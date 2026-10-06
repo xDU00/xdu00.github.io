@@ -237,9 +237,6 @@ enum I18nKey {
     hour = "hour",
     minute = "minute",
     second = "second",
-
-    // 音乐播放器
-    playlist = "playlist",
 }
 
 export default I18nKey;

@@ -1,7 +1,7 @@
 ---
 import "katex/dist/katex.css";
 
-import { siteConfig, profileConfig, umamiConfig, musicPlayerConfig, pioConfig } from "@/config";
+import { siteConfig, profileConfig, umamiConfig, pioConfig } from "@/config";
 import type { Favicon } from "@/types/config";
 import { defaultFavicons } from "@constants/icon";
 import { BREAKPOINT_LG } from "@/constants/breakpoints";
@@ -16,7 +16,6 @@ import {
 } from "@constants/constants";
 import { pathsEqual, url } from "@utils/url-utils";
 import ConfigCarrier from "@components/ConfigCarrier.astro";
-import MusicPlayer from "@components/widget/MusicPlayer.svelte";
 import Pio from "@components/widget/Pio.svelte";
 import "@styles/navbar.css";
 import "@styles/banner.css";
@@ -341,9 +340,6 @@ const defaultOgImage = new URL(getDefaultBanner(), Astro.site).toString();
         <ConfigCarrier></ConfigCarrier>
         <slot />
 
-        <!-- Music Player - 仅在启用时加载 -->
-        {musicPlayerConfig.enable && <MusicPlayer client:load />}
-
         <!-- Pio 看板娘组件 -->
         <!-- 注意：Pio 组件需要放在 body 标签内，但要在其他内容之前 -->
         <!-- 如果启用了侧边栏，可能需要调整 z-index -->
@@ -598,9 +594,8 @@ const setup = () => {
     window.swup.hooks.on('content:replace', () => {
         // 只处理新的katex元素的滚动条，使用原生CSS滚动条
         initCustomScrollbar();
-        // 检查当前页面是否为文章页面（有TOC元素）
-        const tocWrapper = document.getElementById('toc-wrapper');
-        const isArticlePage = tocWrapper !== null;
+        // 检查当前页面是否为文章页面
+        const isArticlePage = document.querySelector('.markdown-content, .custom-md') !== null;
         // 只在文章页面重新初始化 TOC 组件
         if (isArticlePage) {
             const tocElement = document.querySelector('table-of-contents');
@@ -609,6 +604,7 @@ const setup = () => {
                     (tocElement as any).init();
                 }, 100);
             }
+            setTimeout(updateSidebarTocState, 100);
             // 重新初始化移动端 TOC 组件
             if (typeof (window as any).mobileTOCInit === 'function') {
                 setTimeout(() => {
@@ -692,11 +688,6 @@ const setup = () => {
         if (heightExtend) {
             heightExtend.classList.remove('hidden')
         }
-        // Hide the TOC while scrolling back to top
-        let toc = document.getElementById('toc-wrapper');
-        if (toc) {
-            toc.classList.add('toc-not-ready')
-        }
     });
     window.swup.hooks.on('page:view', () => {
         // hide the temp high element when the transition is done
@@ -730,11 +721,6 @@ const setup = () => {
             if (heightExtend) {
                 heightExtend.classList.add('hidden')
             }
-            // Just make the transition looks better
-            const toc = document.getElementById('toc-wrapper');
-            if (toc) {
-                toc.classList.remove('toc-not-ready')
-            }
         }, 200)
     });
 }
@@ -745,63 +731,54 @@ if (window?.swup?.hooks) {
 }
 
 let backToTopBtn = document.getElementById('back-to-top-btn');
-let toc = document.getElementById('toc-wrapper');
 let navbar = document.getElementById('navbar-wrapper')
 
-// 节流函数
-function throttle(func: (...args: any[]) => void, limit: number) {
-    let inThrottle: boolean;
-    return function(this: any, ...args: any[]) {
-        if (!inThrottle) {
-            func.apply(this, args);
-            inThrottle = true;
-            setTimeout(() => inThrottle = false, limit);
-        }
-    }
+function updateSidebarTocState() {
+    const sidebar = document.getElementById('sidebar-sticky');
+    if (!sidebar) return;
+
+    const firstSection = document.querySelector('.markdown-content h2, .custom-md h2');
+    const isPastArticleIntro =
+        window.innerWidth >= BREAKPOINT_LG &&
+        firstSection instanceof HTMLElement &&
+        firstSection.getBoundingClientRect().top <= 180;
+
+    sidebar.classList.toggle('article-toc-active', isPastArticleIntro);
 }
 
+// 节流函数
+let scrollFrame = 0;
 function scrollFunction() {
-    const scrollTop = document.documentElement.scrollTop;
-    const bannerHeight = window.innerHeight * (BANNER_HEIGHT / 100);
+    if (scrollFrame) return;
 
-    // 批量处理DOM操作
-    requestAnimationFrame(() => {
+    scrollFrame = requestAnimationFrame(() => {
+        scrollFrame = 0;
+        const scrollTop = document.documentElement.scrollTop;
+        const bannerHeight = window.innerHeight * (BANNER_HEIGHT / 100);
+
         if (backToTopBtn) {
-            if (scrollTop > bannerHeight) {
-                backToTopBtn.classList.remove('hide')
-            } else {
-                backToTopBtn.classList.add('hide')
-            }
+            backToTopBtn.classList.toggle('hide', scrollTop <= bannerHeight);
         }
-        if (bannerEnabled && toc) {
-            if (scrollTop > bannerHeight) {
-                toc.classList.remove('toc-hide')
-            } else {
-                toc.classList.add('toc-hide')
-            }
-        }
+        updateSidebarTocState();
         if (bannerEnabled && navbar) {
             const isHome = document.body.classList.contains('lg:is-home') && window.innerWidth >= BREAKPOINT_LG;
             const currentBannerHeight = isHome ? BANNER_HEIGHT_HOME : BANNER_HEIGHT;
             const threshold = window.innerHeight * (currentBannerHeight / 100) - 88;
-            if (scrollTop >= threshold) {
-                navbar.classList.add('navbar-hidden')
-            } else {
-                navbar.classList.remove('navbar-hidden')
-            }
+            navbar.classList.toggle('navbar-hidden', scrollTop >= threshold);
         }
     });
 }
 
-// 使用节流优化滚动性能
-window.onscroll = throttle(scrollFunction, 16); // 约60fps
+window.addEventListener('scroll', scrollFunction, { passive: true });
+updateSidebarTocState();
 
-window.onresize = () => {
+window.addEventListener('resize', () => {
     // calculate the --banner-height-extend, which needs to be a multiple of 4 to avoid blurry text
     let offset = Math.floor(window.innerHeight * (BANNER_HEIGHT_EXTEND / 100));
     offset = offset - offset % 4;
     document.documentElement.style.setProperty('--banner-height-extend', `${offset}px`);
-}
+    updateSidebarTocState();
+});
 
 </script>
 

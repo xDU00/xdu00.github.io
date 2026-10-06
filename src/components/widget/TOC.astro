@@ -264,7 +264,8 @@ class TableOfContents extends HTMLElement {
             return;
         }
         // 从当前页面重新获取标题
-        const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6'))
+        const articleContent = document.querySelector('.markdown-content, .custom-md');
+        const headings = Array.from(articleContent?.querySelectorAll('h1, h2, h3, h4, h5, h6') ?? [])
             .filter(h => h.id)
             .map(h => ({
                 depth: parseInt(h.tagName.substring(1)),

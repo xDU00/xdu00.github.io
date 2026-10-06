@@ -82,12 +82,13 @@ function setupAsciiPortrait(root: Element) {
     let cells: Cell[] = [];
     let loadedImg: HTMLImageElement | null = null;
     let started = false;
-    let rafId = 0;
+    let rafId: number | null = null;
     let size = { w: 0, h: 0, dpr: 1, fontSize: 8, charW: 5, charH: 8 };
     let resizePending = false;
 
     // hover state
     let hovered = false;
+    let isAnimating = false;
     let scrambleStart = -1e9;
     let origin = { x: 0, y: 0 };
 
@@ -170,6 +171,10 @@ function setupAsciiPortrait(root: Element) {
     }
 
     function beginScramble() {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            return;
+        }
+
         // Stagger each char by its distance from the hover point.
         const { w, h } = size;
         const maxDist = Math.hypot(w, h);
@@ -178,6 +183,8 @@ function setupAsciiPortrait(root: Element) {
             c.delay = (d / maxDist) * WAVE_DURATION;
         }
         scrambleStart = performance.now();
+        isAnimating = true;
+        scheduleRender();
     }
 
     const render = (now: number) => {
@@ -205,7 +212,22 @@ function setupAsciiPortrait(root: Element) {
         }
         ctx.globalAlpha = 1;
 
-        rafId = requestAnimationFrame(render);
+        if (isAnimating && hovered && now - scrambleStart < WAVE_DURATION + SETTLE_DURATION) {
+            rafId = requestAnimationFrame((nextNow) => {
+                rafId = null;
+                render(nextNow);
+            });
+        } else {
+            isAnimating = false;
+        }
+    };
+
+    function scheduleRender() {
+        if (!started || rafId !== null) return;
+        rafId = requestAnimationFrame((now) => {
+            rafId = null;
+            render(now);
+        });
     }
 
     async function load() {
@@ -214,8 +236,7 @@ function setupAsciiPortrait(root: Element) {
             loadedImg = await loadImage(src);
             rebuild();
             started = true;
-            cancelAnimationFrame(rafId);
-            rafId = requestAnimationFrame(render);
+            scheduleRender();
         } catch (err) {
             console.error("AsciiPortrait: failed to load image", src, err);
         }
@@ -226,7 +247,10 @@ function setupAsciiPortrait(root: Element) {
         resizePending = true;
         requestAnimationFrame(() => {
             resizePending = false;
-            if (started) rebuild();
+            if (started) {
+                rebuild();
+                scheduleRender();
+            }
         });
     }
 
@@ -241,6 +265,8 @@ function setupAsciiPortrait(root: Element) {
     });
     root.addEventListener("mouseleave", () => {
         hovered = false;
+        isAnimating = false;
+        scheduleRender();
     });
     root.addEventListener("touchstart", (e: TouchEvent) => {
         hovered = true;
@@ -255,6 +281,8 @@ function setupAsciiPortrait(root: Element) {
         beginScramble();
         window.setTimeout(() => {
             hovered = false;
+            isAnimating = false;
+            scheduleRender();
         }, WAVE_DURATION + SETTLE_DURATION + 100);
     });
 

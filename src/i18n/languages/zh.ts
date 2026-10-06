@@ -242,5 +242,4 @@ export const zh: Translation = {
     [Key.second]: "秒",
 
     // 音乐播放器
-    [Key.playlist]: "播放列表",
 };

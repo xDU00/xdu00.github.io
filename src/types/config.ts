@@ -466,46 +466,6 @@ export type ParticleConfig = {
  * 
  */
 
-export type MusicPlayerTrack = {
-    // 序号
-    id: number | string;
-    // 标题
-    title: string;
-    // 作者
-    artist: string;
-    // 封面
-    cover: string;
-    // 路径
-    url: string;
-    // 时长
-    duration: number;
-};
-
-
-// 音乐播放器配置
-export type MusicPlayerConfig = {
-    // 启用音乐播放器功能
-    enable: boolean;
-    // 默认模式
-    mode: "meting" | "local";
-    // meting 模式专属配置
-    meting: {
-        // Meting API 地址
-        meting_api: string;
-        // 音乐平台
-        server: "netease" | "tencent" | "kugou" | "baidu" | "kuwo";
-        // 类型
-        type: "playlist" | "album" | "artist" | "song" | "search";
-        // 资源 ID
-        id: string;
-    };
-    // local 模式专属配置
-    local: {
-        // 播放列表
-        playlist: MusicPlayerTrack[];
-    };
-};
-
 /**
  * 
  */

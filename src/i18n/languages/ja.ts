@@ -242,5 +242,4 @@ export const ja: Translation = {
     [Key.second]: "秒",
 
     // 音楽プレーヤー
-    [Key.playlist]: "プレイリスト",
 };

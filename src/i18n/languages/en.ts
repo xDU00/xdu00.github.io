@@ -242,5 +242,4 @@ export const en: Translation = {
     [Key.second]: "second",
 
     // Music Player
-    [Key.playlist]: "Playlist",
 };

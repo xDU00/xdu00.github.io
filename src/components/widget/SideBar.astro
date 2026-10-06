@@ -1,5 +1,6 @@
 ---
 import type { MarkdownHeading } from "astro";
+import { Icon } from "astro-icon/components";
 
 import { widgetManager } from "@utils/widget-manager";
 import Profile from "./Profile.astro";
@@ -68,13 +69,24 @@ function renderComponent(component: any, index: number, components: any[]) {
     <!-- 粘性组件区域 -->
     {stickyComponents.length > 0 && (
         <div id="sidebar-sticky" class="transition-all duration-700 flex flex-col w-full gap-4 sticky top-4">
-            {stickyComponents.map((component, index) => {
-                const renderData = renderComponent(component, index, stickyComponents);
-                if (!renderData) return null;
+            <div id="sidebar-sticky-content" class="flex flex-col w-full gap-4">
+                {stickyComponents.map((component, index) => {
+                    const renderData = renderComponent(component, index, stickyComponents);
+                    if (!renderData) return null;
 
-                const { Component, props } = renderData;
-                return <Component {...props} />;
-            })}
+                    const { Component, props } = renderData;
+                    return <Component {...props} />;
+                })}
+            </div>
+            {side === "right" && headings && headings.length > 0 && (
+                <section id="toc-wrapper" class="hidden card-base max-h-[calc(100vh-2rem)] overflow-y-auto p-5" aria-labelledby="sidebar-toc-heading">
+                    <h2 id="sidebar-toc-heading" class="mb-3 flex items-center gap-2 text-lg font-bold text-90">
+                        <Icon name="material-symbols:format-list-bulleted" class="text-[var(--primary)]" />
+                        Table of Contents
+                    </h2>
+                    <TOC headings={headings} />
+                </section>
+            )}
         </div>
     )}
 </div>

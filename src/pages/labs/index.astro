@@ -1,0 +1,37 @@
+---
+import { Icon } from "astro-icon/components";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+---
+
+<MainGridLayout
+    title="Writeups"
+    description="Cybersecurity lab and CTF writeups."
+>
+    <section class="space-y-5" aria-labelledby="writeups-heading">
+        <div class="card-base px-6 py-7 md:px-8">
+            <h1 id="writeups-heading" class="mb-3 text-3xl font-bold text-90 md:text-4xl">
+                Writeups
+            </h1>
+            <p class="max-w-3xl text-75">
+                Browse writeups from cybersecurity labs and challenges.
+            </p>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2">
+            <a href="/labs/cyberdefenders/" class="card-base group px-6 py-6 transition hover:-translate-y-1">
+                <div class="mb-3 flex items-center gap-2 text-[var(--primary)]">
+                    <Icon name="material-symbols:shield-outline" class="text-xl" />
+                    <h2 class="text-xl font-semibold">CyberDefenders</h2>
+                </div>
+                <p class="text-75">Network forensics, malware analysis, and blue-team investigations.</p>
+            </a>
+            <a href="/labs/htb-sherlocks/" class="card-base group px-6 py-6 transition hover:-translate-y-1">
+                <div class="mb-3 flex items-center gap-2 text-[var(--primary)]">
+                    <Icon name="mdi:cube-outline" class="text-xl" />
+                    <h2 class="text-xl font-semibold">HTB Sherlocks</h2>
+                </div>
+                <p class="text-75">Investigative blue-team challenges from Hack The Box.</p>
+            </a>
+        </div>
+    </section>
+</MainGridLayout>

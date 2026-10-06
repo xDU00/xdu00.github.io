@@ -193,6 +193,22 @@ export class ParticleManager {
     private animationId: number | null = null;
     private img: HTMLImageElement | null = null;
     private isRunning = false;
+    private readonly handleVisibilityChange = () => {
+        if (document.hidden) {
+            if (this.animationId !== null) {
+                cancelAnimationFrame(this.animationId);
+                this.animationId = null;
+            }
+        } else {
+            this.startAnimation();
+        }
+    };
+    private readonly handleResize = () => {
+        if (this.canvas) {
+            this.canvas.width = window.innerWidth;
+            this.canvas.height = window.innerHeight;
+        }
+    };
 
     constructor(config: ParticleConfig) {
         this.config = config;
@@ -219,6 +235,7 @@ export class ParticleManager {
 
         this.createCanvas();
         this.createParticleList();
+        document.addEventListener("visibilitychange", this.handleVisibilityChange);
         this.startAnimation();
         this.isRunning = true;
     }
@@ -237,7 +254,7 @@ export class ParticleManager {
         this.ctx = this.canvas.getContext("2d");
 
         // 监听窗口大小变化
-        window.addEventListener("resize", this.handleResize.bind(this));
+        window.addEventListener("resize", this.handleResize);
     }
 
     // 创建粒子列表
@@ -285,7 +302,15 @@ export class ParticleManager {
 
     // 开始动画
     private startAnimation(): void {
-        if (!this.ctx || !this.canvas || !this.particleList) return;
+        if (
+            !this.ctx ||
+            !this.canvas ||
+            !this.particleList ||
+            this.animationId !== null ||
+            document.hidden
+        ) {
+            return;
+        }
 
         const animate = () => {
             if (!this.ctx || !this.canvas || !this.particleList) return;
@@ -300,13 +325,6 @@ export class ParticleManager {
     }
 
     // 处理窗口大小变化
-    private handleResize(): void {
-        if (this.canvas) {
-            this.canvas.width = window.innerWidth;
-            this.canvas.height = window.innerHeight;
-        }
-    }
-
     // 停止粒子特效
     stop(): void {
         if (this.animationId) {
@@ -319,7 +337,8 @@ export class ParticleManager {
             this.canvas = null;
         }
 
-        window.removeEventListener("resize", this.handleResize.bind(this));
+        window.removeEventListener("resize", this.handleResize);
+        document.removeEventListener("visibilitychange", this.handleVisibilityChange);
         this.isRunning = false;
     }
 

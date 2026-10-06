@@ -7,7 +7,6 @@ import type {
     PostConfig,
     FooterConfig,
     ParticleConfig,
-    MusicPlayerConfig,
 } from "./types/config";
 import { LinkPreset } from "./types/config";
 import { getTranslateLanguageFromConfig, detectBrowserLanguage } from "./utils/language-utils";
@@ -129,7 +128,7 @@ export const siteConfig: SiteConfig = {
                 // 副标题，支持单个字符串或字符串数组
                 subtitle: [
                     "CTF writeups, DFIR notes, and blue team practice",
-                    "Binary exploitation and security lab writeups",
+                    "Cybersecurity investigations, research, and practical learning",
                 ],
                 // 副标题打字机效果
                 typewriter: {
@@ -162,7 +161,7 @@ export const siteConfig: SiteConfig = {
                 // 启用水波纹效果
                 enable: true,
                 // 启用性能模式 (简化波浪效果以提升性能)
-                performanceMode: false,
+                performanceMode: true,
             },
         },
         // Fullscreen 模式专属配置
@@ -203,7 +202,7 @@ export const navBarConfig: NavBarConfig = {
         LinkPreset.Home,
         LinkPreset.About,
         {
-            name: "Labs",
+            name: "Writeups",
             url: "/labs/",
             icon: "material-symbols:science-outline",
             children: [
@@ -211,6 +210,11 @@ export const navBarConfig: NavBarConfig = {
                     name: "CyberDefenders",
                     url: "/labs/cyberdefenders/",
                     icon: "material-symbols:shield-outline",
+                },
+                {
+                    name: "HTB Sherlocks",
+                    url: "/labs/htb-sherlocks/",
+                    icon: "mdi:cube-outline",
                 },
             ],
         },
@@ -505,46 +509,6 @@ export const particleConfig: ParticleConfig = {
 };
 
 
-// 音乐播放器配置
-export const musicPlayerConfig: MusicPlayerConfig = {
-    // 启用音乐播放器功能
-    enable: true,
-    // 默认模式 ("meting" API | "local" 本地)
-    mode: "meting",
-    // meting 模式专属配置
-    meting: {
-        // Meting API 地址
-        meting_api: "https://api.i-meto.com/meting/api",
-        // 音乐平台
-        server: "netease",
-        // 类型 ("playlist" 歌单 | "song" 单曲)
-        type: "playlist",
-        // 资源 ID
-        id: "2161912966",
-    },
-    // local 模式专属配置
-    local: {
-        // 播放列表
-        playlist: [
-            {
-                // 序号
-                id: 1,
-                // 标题
-                title: "深海之息",
-                // 作者
-                artist: "Youzee Music",
-                // 封面
-                cover: "https://p1.music.126.net/PhKOqFtljgHDDpKYM2ADUA==/109951169858309716.jpg",
-                // 路径
-                url: "assets/music/url/深海之息.m4a",
-                // 时长
-                duration: 146,
-            },
-        ],
-    },
-};
-
-
 // 看板娘配置
 export const pioConfig: import("./types/config").PioConfig = {
     // 启用看板娘
@@ -593,6 +557,5 @@ export const widgetConfigs = {
     announcement: announcementConfig,
     layout: sidebarLayoutConfig,
     particle: particleConfig,
-    music: musicPlayerConfig,
     pio: pioConfig,
 } as const;

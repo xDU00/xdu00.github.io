@@ -19,6 +19,11 @@ let observer: IntersectionObserver;
 let isHomePage = false;
 let swupReady = false;
 
+const getArticleHeadings = () =>
+    document.querySelectorAll<HTMLElement>(
+        ".markdown-content h1, .markdown-content h2, .markdown-content h3, .markdown-content h4, .markdown-content h5, .markdown-content h6, .custom-md h1, .custom-md h2, .custom-md h3, .custom-md h4, .custom-md h5, .custom-md h6",
+    );
+
 const togglePanel = () => {
     const panel = document.getElementById("mobile-toc-panel");
     panel?.classList.toggle("float-panel-closed");
@@ -36,7 +41,7 @@ const setPanelVisibility = (show: boolean): void => {
 };
 
 const generateTOC = () => {
-    const headings = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
+    const headings = getArticleHeadings();
     const items: Array<{ id: string; text: string; level: number }> = [];
 
     headings.forEach((heading) => {
@@ -113,26 +118,8 @@ const navigateToPost = (url: string) => {
     navigateToPage(url);
 };
 
-const updateActiveHeading = () => {
-    const headings = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
-    const scrollTop = window.scrollY;
-    const offset = 100;
-
-    let currentActiveId = "";
-    headings.forEach((heading) => {
-        if (heading.id) {
-            const elementTop = (heading as HTMLElement).offsetTop - offset;
-            if (scrollTop >= elementTop) {
-                currentActiveId = heading.id;
-            }
-        }
-    });
-
-    activeId = currentActiveId;
-};
-
 const setupIntersectionObserver = () => {
-    const headings = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
+    const headings = getArticleHeadings();
 
     if (observer) {
         observer.disconnect();
@@ -195,7 +182,6 @@ const init = () => {
     } else {
         generateTOC();
         setupIntersectionObserver();
-        updateActiveHeading();
     }
 };
 
@@ -203,14 +189,10 @@ onMount(() => {
     // 延迟初始化，确保页面内容已加载
     setTimeout(init, 100);
 
-    // 监听滚动事件作为备用
-    window.addEventListener("scroll", updateActiveHeading);
-
     return () => {
         if (observer) {
             observer.disconnect();
         }
-        window.removeEventListener("scroll", updateActiveHeading);
     };
 });
 
@@ -233,7 +215,7 @@ if (typeof window !== "undefined") {
 <!-- Mobile TOC Panel -->
 <div
     id="mobile-toc-panel"
-    class="float-panel float-panel-closed mobile-toc-panel absolute md:w-[20rem] w-[calc(100vw-2rem)]
+    class="float-panel float-panel-closed mobile-toc-panel absolute md:w-[20rem] w-[calc(100vw-2rem)] lg:!hidden
         top-20 left-4 md:left-[unset] right-4 shadow-2xl rounded-2xl p-4"
 >
     <div class="flex items-center justify-between mb-4">

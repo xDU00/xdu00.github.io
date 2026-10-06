@@ -61,7 +61,7 @@ let links: NavBarLink[] = navBarConfig.links.map(
         <div class="flex items-center space-x-2 sm:space-x-1 md:space-x-0.5 navbar-buttons" id="navbar-buttons">
             <!--<SearchPanel client:load>-->
             <Search client:only="svelte" class="hidden xs:block"></Search>
-            <MobileTOC client:only="svelte" class="hidden sm:block"></MobileTOC>
+            <MobileTOC client:only="svelte" class="hidden sm:block lg:!hidden"></MobileTOC>
             <TranslateButton client:only="svelte" class="hidden md:block"></TranslateButton>
             {!siteConfig.themeColor.fixed && (
                     <button aria-label="Display Settings" class="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90 hidden lg:flex items-center justify-center" id="display-settings-switch">

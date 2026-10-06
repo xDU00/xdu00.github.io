@@ -1,4 +1,14 @@
 /* 手机端无侧边栏布局优化 */
+@media (min-width: 1024px) {
+    #sidebar-sticky.article-toc-active #sidebar-sticky-content {
+        display: none;
+    }
+
+    #sidebar-sticky.article-toc-active #toc-wrapper {
+        display: block;
+    }
+}
+
 @media (max-width: 768px) {
     .mobile-no-sidebar {
         display: block !important;
