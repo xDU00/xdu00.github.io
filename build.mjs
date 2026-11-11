@@ -177,7 +177,7 @@ function masthead(current) {
 function footer() {
   return `<footer class="site-footer"><a class="wordmark" href="/">xDU<span>0</span></a><nav>${SITE.links.map(([n, u]) => `<a href="${u}" rel="noopener" target="_blank">${n} ↗</a>`).join("")}<a href="/rss.xml">RSS</a><a href="#top">Back to the beginning ↑</a></nav></footer>`;
 }
-function page({ title, description, url, current, body, image, type = "website", preload, fullTitle, jsonld, published, noindex, card = "summary_large_image" }) {
+function page({ title, description, url, current, body, image, type = "website", preload, fullTitle, jsonld, published, noindex, card = "summary_large_image", tabTitle }) {
   const full = fullTitle || (title ? `${title} — ${SITE.title}` : `${SITE.title} — ${SITE.tagline}`);
   const canonical = SITE.url + url;
   return `<!doctype html>
@@ -185,7 +185,7 @@ function page({ title, description, url, current, body, image, type = "website",
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${esc(full)}</title>
+<title>${esc(tabTitle || full)}</title>
 <meta name="description" content="${esc(description || SITE.description)}">
 <meta name="author" content="${esc(SITE.name)}">
 ${noindex ? '<meta name="robots" content="noindex">\n' : ""}${SITE.googleVerification ? `<meta name="google-site-verification" content="${esc(SITE.googleVerification)}">\n` : ""}<meta name="theme-color" content="#f4f0e7">
@@ -460,7 +460,7 @@ async function aboutPage(posts) {
 </section>
 <div class="column"><article class="prose home">${parts.join("\n")}</article></div>`;
   const og = ogImage({ abs: C("avatar.jpg"), w: 1200 }, "img/og-home.jpg");
-  return page({ fullTitle: `${a.name} (${a.handle}) — Cybersecurity Analyst & CTF Player`, url: "/", current: "/", body, image: og, card: "summary",
+  return page({ tabTitle: `${a.handle} blog`, fullTitle: `${a.name} (${a.handle}) — Cybersecurity Analyst & CTF Player`, url: "/", current: "/", body, image: og, card: "summary",
     description: `${a.name} (${a.handle}): cybersecurity analyst, Master student and CTF player with Phr34k$. CTF write-ups, DFIR labs, projects and certifications.`,
     jsonld: ld({ "@context": "https://schema.org", "@graph": [
       { ...PERSON, image: SITE.url + og, description: stripTags(il(a.byline)), knowsAbout: ["Security Operations", "Incident Response", "Digital Forensics", "Threat Detection", "CTF"] },
