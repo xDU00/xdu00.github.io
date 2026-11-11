@@ -81,7 +81,7 @@ certificates:
     status: done
     date: Oct 2026
     image: esoc.png
-    url: https://certs.ine.com/dc7377c8-4cc9-4763-bb71-50d35c391f84
+    url: "https://certs.ine.com/dc7377c8-4cc9-4763-bb71-50d35c391f84#acc.qUJeZCLS"
   - name: Certified Ethical Hacker (CEH) v13
     short: CEH v13
     issuer: EC-Council

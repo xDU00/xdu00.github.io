@@ -18,11 +18,21 @@ const SITE = {
   tagline: "Cybersecurity Notes and CTF Writeups",
   description: "CTF writeups, DFIR notes, and blue team practice by xDU0.",
   author: "xDU0",
+  name: "Hilmi Ouelhazi",
+  jobTitle: "Cybersecurity Analyst",
   bio: "Cybersecurity Student | DFIR & Blue Team | CTF Player",
   links: [
     ["GitHub", "https://github.com/xDU00"],
     ["LinkedIn", "https://www.linkedin.com/in/hilmi-ouelhazi/"],
   ],
+  // Profiles that are you, so Google links them to your name (sameAs).
+  profiles: [
+    "https://github.com/xDU00",
+    "https://www.linkedin.com/in/hilmi-ouelhazi/",
+    "https://ctftime.org/team/278448/",
+  ],
+  // Paste the code from Google Search Console here (only the content="..." part).
+  googleVerification: "",
 };
 const NAV = [
   ["About", "/"],
@@ -72,7 +82,7 @@ async function image(srcAbs, outBase, widths = [760, 1480]) {
   const variants = ws.map((w) => ({ w, h: Math.round((h0 * w) / w0), rel: `${outBase}-${w}.webp` }));
   for (const v of variants) imgJobs.set(v.rel, { src: srcAbs, ...v });
   const big = variants.at(-1);
-  const res = { src: "/" + big.rel, w: big.w, h: big.h, srcset: variants.map((v) => `/${v.rel} ${v.w}w`).join(", "), variants };
+  const res = { src: "/" + big.rel, w: big.w, h: big.h, srcset: variants.map((v) => `/${v.rel} ${v.w}w`).join(", "), variants, abs: srcAbs };
   imgMeta.set(key, res);
   return res;
 }
@@ -85,11 +95,22 @@ async function runImageJobs() {
       const out = path.join(OUT, j.rel);
       if (existsSync(out)) continue;
       await fs.mkdir(path.dirname(out), { recursive: true });
-      await sharp(j.src).resize({ width: j.w, withoutEnlargement: true }).webp({ quality: 80, effort: 5 }).toFile(out);
+      const pipe = sharp(j.src).resize({ width: j.w, withoutEnlargement: true });
+      if (j.rel.endsWith(".jpg")) await pipe.flatten({ background: "#ffffff" }).jpeg({ quality: 82, mozjpeg: true }).toFile(out);
+      else await pipe.webp({ quality: 80, effort: 5 }).toFile(out);
     }
   };
   await Promise.all(Array.from({ length: 6 }, worker));
 }
+// Social/search preview image: JPEG, because some platforms don't read WebP.
+function ogImage(im, rel) {
+  if (!im?.abs) return null;
+  const w = Math.min(1200, im.w);
+  imgJobs.set(rel, { src: im.abs, w, rel });
+  return "/" + rel;
+}
+const ld = (obj) => `<script type="application/ld+json">${JSON.stringify(obj).replace(/</g, "\\u003c")}</script>`;
+const PERSON = { "@type": "Person", "@id": SITE.url + "/#person", name: SITE.name, alternateName: SITE.author, url: SITE.url + "/", jobTitle: SITE.jobTitle, sameAs: SITE.profiles };
 const imgTag = (im, alt, { sizes = "(max-width: 760px) 100vw, 740px", eager = false, cls = "" } = {}) =>
   `<img src="${im.src}" srcset="${im.srcset}" sizes="${sizes}" width="${im.w}" height="${im.h}" alt="${esc(alt)}"${cls ? ` class="${cls}"` : ""} ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
 
@@ -156,8 +177,8 @@ function masthead(current) {
 function footer() {
   return `<footer class="site-footer"><a class="wordmark" href="/">xDU<span>0</span></a><nav>${SITE.links.map(([n, u]) => `<a href="${u}" rel="noopener" target="_blank">${n} ↗</a>`).join("")}<a href="/rss.xml">RSS</a><a href="#top">Back to the beginning ↑</a></nav></footer>`;
 }
-function page({ title, description, url, current, body, image, type = "website", preload }) {
-  const full = title ? `${title} — ${SITE.title}` : `${SITE.title} — ${SITE.tagline}`;
+function page({ title, description, url, current, body, image, type = "website", preload, fullTitle, jsonld, published, noindex, card = "summary_large_image" }) {
+  const full = fullTitle || (title ? `${title} — ${SITE.title}` : `${SITE.title} — ${SITE.tagline}`);
   const canonical = SITE.url + url;
   return `<!doctype html>
 <html lang="en" id="top">
@@ -166,17 +187,23 @@ function page({ title, description, url, current, body, image, type = "website",
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(full)}</title>
 <meta name="description" content="${esc(description || SITE.description)}">
-<meta name="theme-color" content="#f4f0e7">
+<meta name="author" content="${esc(SITE.name)}">
+${noindex ? '<meta name="robots" content="noindex">\n' : ""}${SITE.googleVerification ? `<meta name="google-site-verification" content="${esc(SITE.googleVerification)}">\n` : ""}<meta name="theme-color" content="#f4f0e7">
 <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="canonical" href="${canonical}">
 <link rel="icon" href="/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="alternate" type="application/rss+xml" title="${SITE.title}" href="/rss.xml">
+<meta property="og:site_name" content="${esc(SITE.title)}">
+<meta property="og:locale" content="en_US">
 <meta property="og:type" content="${type}">
-<meta property="og:title" content="${esc(title || SITE.title)}">
+<meta property="og:title" content="${esc(fullTitle || title || SITE.title)}">
 <meta property="og:description" content="${esc(description || SITE.description)}">
 <meta property="og:url" content="${canonical}">
-${image ? `<meta property="og:image" content="${SITE.url}${image}">\n<meta name="twitter:card" content="summary_large_image">` : '<meta name="twitter:card" content="summary">'}
+${image ? `<meta property="og:image" content="${SITE.url}${image}">\n<meta name="twitter:card" content="${card}">` : '<meta name="twitter:card" content="summary">'}
+<meta name="twitter:title" content="${esc(fullTitle || title || SITE.title)}">
+<meta name="twitter:description" content="${esc(description || SITE.description)}">
+${published ? `<meta property="article:published_time" content="${published}">\n<meta property="article:author" content="${esc(SITE.name)}">\n` : ""}${jsonld ? jsonld + "\n" : ""}
 ${preload || ""}<style>${CSS}</style>
 <script type="speculationrules">{"prerender":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/*.*"}}]},"eagerness":"moderate"}]}</script>
 </head>
@@ -243,8 +270,8 @@ async function loadPosts() {
     const words = stripTags(html).split(/\s+/).filter(Boolean).length;
     const date = new Date(data.published);
     posts.push({
-      slug, url: `/posts/${slug}/`, title: data.title, description: data.description || "", date,
-      tags: data.tags || [], category: data.category || "Notes", sourceLink: data.sourceLink,
+      slug, url: `/posts/${slug}/`, title: data.title, emphasis: data.emphasis, description: data.description || "", date,
+      tags: data.tags || [], category: data.category || "Notes", sourceLink: data.sourceLink, credential: data.credential,
       html, toc: ctx.toc, cover, minutes: Math.max(1, Math.round(words / 220)),
     });
   }
@@ -278,7 +305,8 @@ function homePage(posts) {
   <nav class="filters" aria-label="Filter by category"><button type="button" data-filter="all" aria-pressed="true">All</button>${cats.map((c) => `<button type="button" data-filter="${esc(catSlug(c))}" aria-pressed="false">${esc(c)}</button>`).join("")}</nav>
 </section>
 <div class="column"><ol class="post-list">${rows}</ol></div>`;
-  return page({ title: "Blog", description: "CTF writeups, DFIR notes and blue team practice by xDU0.", url: "/blog/", current: "/blog/", body, image: posts[0]?.cover?.src });
+  return page({ fullTitle: `Blog — Cybersecurity write-ups by ${SITE.name} (${SITE.author})`, description: `CTF write-ups, HTB Sherlocks, CyberDefenders labs and certification reviews by ${SITE.name} (${SITE.author}).`, url: "/blog/", current: "/blog/", body, image: posts[0]?.cover ? ogImage(posts[0].cover, "img/og-blog.jpg") : null,
+    jsonld: ld({ "@context": "https://schema.org", "@type": "Blog", name: `${SITE.author} blog`, url: SITE.url + "/blog/", author: PERSON, blogPost: posts.map((p) => ({ "@type": "BlogPosting", headline: p.title, url: SITE.url + p.url, datePublished: isoDate(p.date) })) }) });
 }
 function entry(p) {
   return `<li><time datetime="${isoDate(p.date)}">${fmtDate(p.date)} · ${esc(p.category)}</time><a class="title" href="${p.url}">${esc(p.title)}</a><p>${esc(p.description)}</p></li>`;
@@ -296,23 +324,26 @@ function postPage(p, prev, next) {
     : `<aside class="contents" aria-label="Entry"><p>${esc(p.category)}</p><nav><a href="/blog/">← All entries</a></nav></aside>`;
   const body = `<section class="cold-open" aria-labelledby="opening">
   <p class="kicker"><a href="/blog/">← Blog</a> · ${esc(p.category)} · <time datetime="${isoDate(p.date)}">${fmtDate(p.date)}</time> · ${p.minutes} min read</p>
-  <h1 id="opening">${emTitle(p.title)}</h1>
-  <p class="identifiers">${p.tags.map((t) => `<a href="/archive/#tag-${tagSlug(t)}">#${esc(t)}</a>`).join("")}${p.sourceLink ? `<a class="rating" href="${esc(p.sourceLink)}" rel="noopener" target="_blank">Challenge ↗</a>` : ""}</p>
+  <h1 id="opening">${p.emphasis && p.title.includes(p.emphasis) ? esc(p.title).replace(esc(p.emphasis), `<em>${esc(p.emphasis)}</em>`) : emTitle(p.title)}</h1>
+  <p class="identifiers">${p.tags.map((t) => `<a href="/archive/#tag-${tagSlug(t)}">#${esc(t)}</a>`).join("")}${p.credential?.url ? `<a class="rating" href="${esc(p.credential.url)}" rel="noopener" target="_blank">Verify credential ↗</a>` : ""}${p.sourceLink ? `<a class="rating" href="${esc(p.sourceLink)}" rel="noopener" target="_blank">Challenge ↗</a>` : ""}</p>
   ${p.description ? `<p class="lede">${esc(p.description)}</p>` : ""}
 </section>
 <div class="writeup-shell tight" id="writeup">
   ${tocNav}
   <article class="prose" aria-label="${esc(p.title)}">
 ${p.cover ? `<figure class="post-cover">${imgTag(p.cover, p.title, { sizes: "(max-width: 760px) 100vw, 740px", eager: true })}</figure>` : ""}
+${p.credential?.url ? `<a class="credential" href="${esc(p.credential.url)}" rel="noopener" target="_blank"><span class="cred-check" aria-hidden="true">✓</span><span class="cred-text"><span class="cred-label">Verified credential</span><span class="cred-meta">${[p.credential.issuer, p.credential.awarded && `Awarded ${esc(p.credential.awarded)}`, p.credential.id && `ID ${esc(p.credential.id)}`].filter(Boolean).join(" · ")}</span></span><span class="cred-go">View on ${esc(p.credential.issuer || "issuer")} ↗</span></a>` : ""}
 ${p.html}
   <div class="closing">
-    <p>Written by <a href="/">${SITE.author}</a> · ${fmtDate(p.date)}</p>
+    <p>Written by <a href="/" rel="author">${SITE.name} (${SITE.author})</a> · ${fmtDate(p.date)}</p>
     <nav class="pager" aria-label="More entries">${next ? `<a href="${next.url}"><small>← Newer</small>${esc(next.title)}</a>` : "<span></span>"}${prev ? `<a class="next" href="${prev.url}"><small>Older →</small>${esc(prev.title)}</a>` : ""}</nav>
   </div>
   </article>
 </div>`;
   const preload = p.cover ? `<link rel="preload" as="image" imagesrcset="${p.cover.srcset}" imagesizes="(max-width: 760px) 100vw, 740px">\n` : "";
-  return page({ title: p.title, description: p.description, url: p.url, body, image: p.cover?.src, type: "article", preload });
+  const og = p.cover ? ogImage(p.cover, `img/${p.slug}/og.jpg`) : null;
+  const jsonld = ld({ "@context": "https://schema.org", "@type": "BlogPosting", headline: p.title, description: p.description, datePublished: isoDate(p.date), dateModified: isoDate(p.date), url: SITE.url + p.url, mainEntityOfPage: SITE.url + p.url, image: og ? SITE.url + og : undefined, keywords: p.tags.join(", "), articleSection: p.category, author: PERSON, publisher: PERSON });
+  return page({ title: p.title, description: p.description, url: p.url, body, image: og, type: "article", preload, jsonld, published: p.date.toISOString() });
 }
 
 
@@ -330,7 +361,7 @@ function archivePage(posts) {
   <article class="prose">${years.map((y) => `<h2 id="y${y}">${y}</h2><ol class="entries">${posts.filter((p) => p.date.getUTCFullYear() === y).map(entry).join("")}</ol>`).join("")}
   <h2 id="tags">Tags</h2>${byTag}</article>
 </div>`;
-  return page({ title: "Archive", description: "All posts by xDU0, by year and tag.", url: "/archive/", current: "/archive/", body });
+  return page({ title: "Archive", description: `All posts by ${SITE.name} (${SITE.author}), by year and tag.`, url: "/archive/", current: "/archive/", body });
 }
 
 async function loadArt() {
@@ -428,7 +459,14 @@ async function aboutPage(posts) {
   <p class="lede">${il(a.intro)}</p>
 </section>
 <div class="column"><article class="prose home">${parts.join("\n")}</article></div>`;
-  return page({ title: "About", url: "/", current: "/", body, image: av.src, description: `${a.name} (${a.handle}). ${stripTags(il(a.intro)).slice(0, 150)}` });
+  const og = ogImage({ abs: C("avatar.jpg"), w: 1200 }, "img/og-home.jpg");
+  return page({ fullTitle: `${a.name} (${a.handle}) — Cybersecurity Analyst & CTF Player`, url: "/", current: "/", body, image: og, card: "summary",
+    description: `${a.name} (${a.handle}): cybersecurity analyst, Master student and CTF player with Phr34k$. CTF write-ups, DFIR labs, projects and certifications.`,
+    jsonld: ld({ "@context": "https://schema.org", "@graph": [
+      { ...PERSON, image: SITE.url + og, description: stripTags(il(a.byline)), knowsAbout: ["Security Operations", "Incident Response", "Digital Forensics", "Threat Detection", "CTF"] },
+      { "@type": "WebSite", "@id": SITE.url + "/#website", name: SITE.author, alternateName: SITE.name, url: SITE.url + "/", author: { "@id": SITE.url + "/#person" } },
+      { "@type": "ProfilePage", url: SITE.url + "/", mainEntity: { "@id": SITE.url + "/#person" } },
+    ] }) });
 }
 
 async function artPage(items) {
@@ -438,14 +476,14 @@ async function artPage(items) {
   <p class="lede">Pencil, ink, watercolour and acrylic. Tap a piece to see it full size.</p>
   </section>
 <section id="gallery" aria-label="Gallery"><div class="gallery">${items.map(({ name, im }, i) => `<figure><a href="${im.src}" target="_blank" rel="noopener">${imgTag(thumb(im), name, { sizes: "(max-width: 700px) 50vw, 400px", eager: i < 3 })}</a><figcaption>${esc(name)}</figcaption></figure>`).join("")}</div></section>`;
-  return page({ title: "Art", description: "Artwork and illustrations by xDU0.", url: "/art/", current: "/art/", body });
+  return page({ title: "Art", description: `Sketches and paintings by ${SITE.name} (${SITE.author}).`, url: "/art/", current: "/art/", body });
 }
 
 function notFound() {
   const body = `<section class="cold-open slim"><p class="kicker">404</p><h1>Page <em>not found</em></h1><p class="lede">This page doesn't exist or was moved.</p><nav class="shortcuts"><a href="/">Back home ↑</a><a href="/blog/">Read the blog ↘</a></nav></section>`;
-  return page({ title: "Not found", url: "/404.html", body });
+  return page({ title: "Not found", url: "/404.html", body, noindex: true });
 }
-const redirect = (to) => `<!doctype html><meta charset="utf-8"><title>Redirecting…</title><link rel="canonical" href="${to}"><meta http-equiv="refresh" content="0; url=${to}"><a href="${to}">${to}</a>`;
+const redirect = (to) => `<!doctype html><meta charset="utf-8"><title>Redirecting…</title><meta name="robots" content="noindex"><link rel="canonical" href="${SITE.url}${to}"><meta http-equiv="refresh" content="0; url=${to}"><a href="${to}">${to}</a>`;
 
 function rss(posts) {
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -453,8 +491,8 @@ function rss(posts) {
 ${posts.map((p) => `<item><title>${esc(p.title)}</title><link>${SITE.url}${p.url}</link><guid>${SITE.url}${p.url}</guid><pubDate>${p.date.toUTCString()}</pubDate><description>${esc(p.description)}</description>${p.tags.map((t) => `<category>${esc(t)}</category>`).join("")}</item>`).join("\n")}
 </channel></rss>`;
 }
-function sitemap(urls) {
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map((u) => `<url><loc>${SITE.url}${u}</loc></url>`).join("")}</urlset>`;
+function sitemap(entries) {
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.map(([u, d]) => `<url><loc>${SITE.url}${u}</loc>${d ? `<lastmod>${d}</lastmod>` : ""}</url>`).join("\n")}\n</urlset>`;
 }
 
 /* ---------- build ---------- */
@@ -478,7 +516,8 @@ await write("labs/cyberdefenders/index.html", redirect("/blog/"));
 await write("labs/htb-sherlocks/index.html", redirect("/blog/"));
 await write("rss.xml", rss(posts));
 await write("atom.xml", rss(posts));
-await write("sitemap.xml", sitemap(["/", "/blog/", "/archive/", "/art/", ...posts.map((p) => p.url)]));
+const newest = posts[0] ? isoDate(posts[0].date) : isoDate(new Date());
+await write("sitemap.xml", sitemap([["/", newest], ["/blog/", newest], ["/archive/", newest], ["/art/"], ...posts.map((p) => [p.url, isoDate(p.date)])]));
 await write("robots.txt", `User-agent: *\nAllow: /\nSitemap: ${SITE.url}/sitemap.xml\n`);
 await write(".nojekyll", "");
 // logo / favicon from content/avatar.jpg

@@ -1,42 +1,47 @@
-# xDU0 blog
+# xDU0 — Personal Blog
 
-Static blog, no framework. One build script turns Markdown into plain HTML.
+**🌐 [xdu00.github.io](https://xdu00.github.io)**
 
-## Write a post
-1. Drop a `.md` file in `content/posts/` (images go in `content/posts/img/`).
-2. Frontmatter:
-   ```yaml
-   ---
-   title: My Lab Writeup
-   published: 2026-10-24
-   description: One-line summary shown on the home page.
-   cover: "./img/my-cover.png"      # optional, local file
-   tags: [DFIR, HTB]
-   category: HTB Sherlocks          # groups posts on /writeups/
-   sourceLink: "https://..."        # optional "Challenge ↗" link
-   draft: false
-   ---
-   ```
-3. `npm run dev`: builds and opens http://localhost:4321
+Hi, I'm **Hilmi Ouelhazi** (xDU0), a cybersecurity analyst, Master student and CTF player with [Phr34k$](https://ctftime.org/team/278448/).
 
-Art: drop images in `content/art/` (the file name becomes the caption).
-About page: `content/about.md`. Site name, bio and links are in `SITE` at the top of `build.mjs`.
-Design: `src/style.css`. Tiny client script: `src/site.js`.
+This is my personal blog. I share my experiences, write-ups and personal achievements: CTF challenges, CyberDefenders labs, HTB Sherlocks and notes from the blue-team side of security.
 
-## Deploy
-From this folder, in PowerShell:
+## Write-ups
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\deploy.ps1 "Describe your change"
-```
+| Write-up | Category |
+|---|---|
+| [HTB Sherlock: Baggage](https://xdu00.github.io/posts/sherlock-writeup/) | HTB Sherlocks · Windows forensics |
+| [Will AI Kill the SOC Analyst Job?](https://xdu00.github.io/posts/will-ai-kill-the-soc-analyst-job/) | Cybersecurity |
+| [XLMRat Lab](https://xdu00.github.io/posts/xlmrat-lab-writeup/) | CyberDefenders · Network forensics |
+| [Securinets ISGT Guided CTF](https://xdu00.github.io/posts/securinets-isgt-guided-ctf-writeups/) | CTF · Web, rev, OSINT |
+| [HTB University CTF 2025 — Tinsel Trouble](https://xdu00.github.io/posts/htb-university-ctf-2025---pwn-1-writeup/) | CTF · Pwn |
 
-It copies this folder into github.com/xDU00/xdu00.github.io (without `node_modules` and `dist`), commits and pushes.
-GitHub Actions (`.github/workflows/deploy.yml`) then builds the site and publishes it to https://xdu00.github.io.
-Repo → Settings → Pages → Source must be **GitHub Actions**.
+More on the [blog](https://xdu00.github.io/blog/).
 
-## Why it's fast
-- Plain static HTML, CSS inlined, no web fonts (Georgia/Arial/system mono), ~8–12 KB gzipped per page
-- All images converted to WebP at 2 sizes with `srcset`, explicit width/height (zero layout shift), lazy-loaded
-- Syntax highlighting done at build time, so no highlighter JS ships
-- Speculation Rules prerender links on hover (Chrome/Edge), so clicks open instantly; prefetch fallback elsewhere
-- Cross-page View Transitions for smooth navigation
+## On the site
+
+- **[About](https://xdu00.github.io/)**: experience, education, projects, certificates and CTF achievements
+- **[Blog](https://xdu00.github.io/blog/)**: all write-ups, filterable by category
+- **[Art](https://xdu00.github.io/art/)**: sketches and paintings
+- Light and night mode
+
+## Connect
+
+[GitHub](https://github.com/xDU00) · [LinkedIn](https://www.linkedin.com/in/hilmi-ouelhazi/) · [CTFtime](https://ctftime.org/team/278448/) · Discord `xduo28_`
+
+---
+
+<details>
+<summary>How this site works</summary>
+
+A small static site generator with no framework. `build.mjs` turns the Markdown in `content/` into plain HTML in `dist/`.
+
+- **New post:** add a `.md` file to `content/posts/` (images in `content/posts/img/`) with front matter: `title`, `published`, `description`, `cover`, `tags`, `category`.
+- **About page:** edit `content/about.md`.
+- **Art:** drop images into `content/art/`.
+- **Preview:** `npm install` once, then `npm run dev` → http://localhost:4321
+- **Deploy:** run `deploy.cmd` (or `deploy.ps1`). It pushes to this repo, and GitHub Actions builds and publishes the site.
+
+Fast by design: static HTML, inlined CSS, no web fonts, WebP images, build-time code highlighting and instant page prefetching.
+
+</details>
