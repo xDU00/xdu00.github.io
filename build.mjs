@@ -32,7 +32,7 @@ const SITE = {
     "https://ctftime.org/team/278448/",
   ],
   // Paste the code from Google Search Console here (only the content="..." part).
-  googleVerification: "",
+  googleVerification: "4ZpquwguqkNCD0_igFvmt1Gmz9SUMRovTNVzyGa3I1A",
 };
 const NAV = [
   ["About", "/"],
